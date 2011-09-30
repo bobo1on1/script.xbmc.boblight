@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon
+	id="script.dfatmo"
+	name="DFAtmo"
+	version="0.1.0"
+	provider-name="durchflieger"
+	>
+	<requires>
+		<import addon="xbmc.python" version="2.0"/>
+	</requires>
+	<extension point="xbmc.python.script" library="dfatmo.py">
+		<provides>executable</provides>
+	</extension>
+  	<extension point="xbmc.service" library="dfatmo.py" start="login"></extension>
+	<extension point="xbmc.addon.metadata">
+		<summary>DFAtmo the driver for 'Atmolight' controllers for XBMC and xinelib based video players.</summary>
+		<description>The DFAtmo XBMC addon analyzes the video picture and generates output data for 'Atmolight' controllers.</description>
+		<platform>all</platform>
+	</extension>
+</addon>
