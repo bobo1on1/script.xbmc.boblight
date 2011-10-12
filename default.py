@@ -24,9 +24,9 @@ c_int(libboblight.boblight_ping(boblight, int* outputused))
 import xbmc, time, xbmcaddon
 from ctypes import *
 
-addon = xbmcaddon.Addon()
-if addon.getSetting('enabled') != 'true':
-  exit(0)
+#addon = xbmcaddon.Addon()
+#if addon.getSetting('enabled') != 'true':
+#  exit(0)
 
 # load libboblight.so
 cdll.LoadLibrary("libboblight.so")
