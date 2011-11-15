@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<strings>
+<!--Common-->
+ 
+  
+<!--Settings-->  
+  <!--General-->
+  <string id="100">General</string>
+  <string id="101">Use remote boblightd</string>
+  <string id="102">Boblightd IP</string>
+  <string id="103">Boblightd Port</string>
+
+  <!--Movie/MusicVideo/Other-->
+  <string id="200">Movie</string>
+  <string id="201">Preset</string>
+  <string id="202">Speed</string>
+  <string id="203">Autospeed</string>
+  <string id="204">Interpolation</string>
+  <string id="205">Use</string>
+  <string id="206">Saturation</string>
+  <string id="207">Value</string>
+  <string id="208">Threshold</string>
+  
+  <string id="220">Custom</string>
+  <string id="221">Smooth</string>
+  <string id="222">Action</string>
+  
+  <!--MusicVideo-->
+  <string id="300">MusicVideo</string>
+  
+  <string id="320">Custom</string>
+  <string id="321">Ballad</string>
+  <string id="322">Rock</string>  
+  
+  <!--Other-->
+  <string id="400">Other</string>
+</strings>
+
+

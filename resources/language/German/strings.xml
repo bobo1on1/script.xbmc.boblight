@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<strings>
+<!--Common-->
+ 
+  
+<!--Settings-->  
+  <!--General-->
+  <string id="100">Allgemein</string>
+  <string id="101">Benutze boblight über Netzwerk</string>
+  <string id="102">Boblightd IP</string>
+  <string id="103">Boblightd Port</string>
+
+  <!--Movie/MusicVideo/Other-->
+  <string id="200">Film</string>
+  <string id="201">Preset</string>
+  <string id="202">Geschwindigkeit</string>
+  <string id="203">autom. Geschwindigkeit</string>
+  <string id="204">Interpolation</string>
+  <string id="205">Benutzen</string>
+  <string id="206">Farbe</string>
+  <string id="207">Wert</string>
+  <string id="208">Schwellwert</string>
+  
+  <string id="220">Eigene</string>
+  <string id="221">ruhig</string>
+  <string id="222">lebhaft</string>
+  
+  <!--MusicVideo-->
+  <string id="300">MusicVideo</string>
+  
+  <string id="320">Eigene</string>
+  <string id="321">Ballade</string>
+  <string id="322">Rock</string>  
+  
+  <!--Other-->
+  <string id="400">Sonstige</string>
+</strings>
+
+
