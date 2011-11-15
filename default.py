@@ -22,10 +22,12 @@ c_int(libboblight.boblight_ping(boblight, int* outputused))
 """
 
 import xbmc, time, xbmcaddon
+import time
 from ctypes import *
 
-#addon = xbmcaddon.Addon()
-#if addon.getSetting('enabled') != 'true':
+__settings__ = xbmcaddon.Addon(id='script.boblight')
+
+#if __settings__.getSetting('enabled') != 'true':
 #  exit(0)
 
 # load libboblight.so
@@ -36,12 +38,20 @@ libboblight.boblight_geterror.restype = c_char_p
 libboblight.boblight_getlightname.restype = c_char_p
 libboblight.boblight_getoptiondescript.restype = c_char_p
 
-current_priority = -1
+global g_saturation 
+global g_value 
+global g_speed 
+global g_autospeed 
+global g_interpolation 
+global g_threshold
+global g_timer
+global g_current_priority
+
 def set_priority(boblight, priority):
-  global current_priority
-  if priority != current_priority:
-    current_priority = priority
-    if not libboblight.boblight_setpriority(boblight, current_priority):
+  global g_current_priority
+  if priority != g_current_priority:
+    g_current_priority = priority
+    if not libboblight.boblight_setpriority(boblight, g_current_priority):
       print "boblight: error setting priority: " + c_char_p(libboblight.boblight_geterror(boblight)).value
       return False
     else:
@@ -55,6 +65,7 @@ def process_boblight(boblight):
   capture = xbmc.RenderCapture()
   capture.capture(capture_width, capture_height, xbmc.CAPTURE_FLAG_CONTINUOUS)
   while not xbmc.abortRequested:
+#    checkForNewSettings(boblight)						#fixme - settings can't be updated this way ... xbmc doesn't support it yet
     capture.waitForCaptureStateChangeEvent(1000)
     if capture.getCaptureState() == xbmc.CAPTURE_STATE_DONE:
       if not set_priority(boblight, 128):
@@ -80,14 +91,169 @@ def process_boblight(boblight):
       if not set_priority(boblight, 255):
         return
 
+#-------------------START handle settings functions--------------------
+def checkForNewSettings(boblight):
+#check for new settings every 5 secs
+  global g_timer
+  if time.time() - g_timer > 5:
+#    print "boblight: checking for new settings"
+    setup(boblight,"movie")			#fixme category
+    g_timer = time.time()
+        
+def setupForMovie(boblight): 
+  preset = int(__settings__.getSetting("movie_preset"))
+#  print "preset: " + str(preset)
+
+  if preset == 1:       #preset smooth
+    saturation    = 3.0
+    value         = 10.0
+    speed         = 20.0
+    autospeed     = 0.0 
+    interpolation = 0
+    threshold     = 0.0
+  elif preset == 2:     #preset action
+    saturation    = 3.0
+    value         = 10.0
+    speed         = 80.0
+    autospeed     = 0.0  
+    interpolation = 0
+    threshold     = 0.0
+  elif preset == 0:     #custom
+    saturation      =  float(__settings__.getSetting("movie_saturation"))
+    value           =  float(__settings__.getSetting("movie_value"))
+    speed           =  float(__settings__.getSetting("movie_speed"))
+    autospeed       =  float(__settings__.getSetting("movie_autospeed"))
+    interpolation   =  int(bool(__settings__.getSetting("movie_interpolation")))
+    threshold       =  float(__settings__.getSetting("movie_threshold"))
+  return (saturation,value,speed,autospeed,interpolation,threshold)
+
+def setupForMusicVideo(boblight):
+  preset = int(__settings__.getSetting("musicvideo_preset"))
+
+  if preset == 1:       #preset Ballad
+    saturation    = 3.0
+    value         = 10.0
+    speed         = 20.0  
+    autospeed     = 0.0
+    interpolation = 1
+    threshold     = 0.0
+  elif preset == 2:     #preset Rock
+    saturation    = 3.0
+    value         = 10.0
+    speed         = 80.0
+    autospeed     = 0.0  
+    interpolation = 0
+    threshold     = 0.0
+  elif preset == 0:     #custom
+    saturation      =  float(__settings__.getSetting("musicvideo_saturation"))
+    value           =  float(__settings__.getSetting("musicvideo_value"))
+    speed           =  float(__settings__.getSetting("musicvideo_speed"))
+    autospeed       =  float(__settings__.getSetting("movie_autospeed"))
+    interpolation   =  int(bool(__settings__.getSetting("musicvideo_interpolation")))
+    threshold       =  float(__settings__.getSetting("musicvideo_threshold"))
+  return (saturation,value,speed,autospeed,interpolation,threshold)
+
+def setupForOther(boblight):
+  saturation      =  float(__settings__.getSetting("other_saturation"))
+  value           =  float(__settings__.getSetting("other_value"))
+  speed           =  float(__settings__.getSetting("other_speed"))
+  autospeed       =  float(__settings__.getSetting("movie_autospeed"))
+  interpolation   =  int(bool(__settings__.getSetting("other_interpolation")))
+  threshold       =  float(__settings__.getSetting("other_threshold"))
+  return (saturation,value,speed,autospeed,interpolation,threshold)
+
+def setup(boblight, category):
+  global g_saturation 
+  global g_value 
+  global g_speed 
+  global g_autospeed 
+  global g_interpolation 
+  global g_threshold
+  global g_timer
+
+#switch case in python - dictionary with function pointers
+  option = { "movie"      : setupForMovie,
+             "musicvideo" : setupForMusicVideo,
+             "other"      : setupForOther,
+  }
+#call the right setup function according to categroy
+  saturation,value,speed,autospeed,interpolation,threshold = option[category](boblight)
+
+#setup boblight - todo error checking
+  if g_saturation != saturation:  
+    ret = c_int(libboblight.boblight_setoption(boblight, -1, "saturation    " + str(saturation)))
+    print "boblight: changed saturation to " + str(saturation) + "(ret " + str(ret.value) + ")"
+    g_saturation = saturation
+  
+  if g_value != value:  
+    ret = c_int(libboblight.boblight_setoption(boblight, -1, "value         " + str(value)))
+    print "boblight: changed value to " + str(value) + "(ret " + str(ret.value) + ")"
+    g_value = value
+
+  if g_speed != speed:  
+    ret = c_int(libboblight.boblight_setoption(boblight, -1, "speed         " + str(speed)))
+    print "boblight: changed speed to " + str(speed) + "(ret " + str(ret.value) + ")"
+    g_speed = speed
+
+  if g_autospeed != autospeed:  
+    ret = c_int(libboblight.boblight_setoption(boblight, -1, "autospeed     " + str(autospeed)))
+    print "boblight: changed autospeed to " + str(autospeed) + "(ret " + str(ret.value) + ")"
+    g_autospeed = autospeed
+
+  if g_interpolation != interpolation:  
+    ret = c_int(libboblight.boblight_setoption(boblight, -1, "interpolation " + str(interpolation)))
+    print "boblight: changed interpolation to " + str(interpolation) + "(ret " + str(ret.value) + ")"
+    g_interpolation = interpolation
+
+  if g_threshold != threshold:  
+    ret = c_int(libboblight.boblight_setoption(boblight, -1, "threshold     " + str(threshold)))
+    print "boblight: changed threshold to " + str(threshold) + "(ret " + str(ret.value) + ")"
+    g_threshold = threshold
+#-------------------END handle settings functions--------------------
+
+def initGlobals():
+  global g_current_priority
+  global g_saturation 
+  global g_value 
+  global g_speed 
+  global g_autospeed 
+  global g_interpolation 
+  global g_threshold
+  global g_timer
+
+  g_current_priority = -1
+  g_saturation     = -1.0 
+  g_value          = -1.0
+  g_speed          = -1.0
+  g_autospeed      = -1.0
+  g_interpolation  = -1
+  g_threshold      = -1.0
+  g_timer          = time.time()      
+
+def printLights(boblight):
+  nrLights = c_int(libboblight.boblight_getnrlights(boblight))
+  print "boblight: Found " + str(nrLights.value) + " lights:"
+
+  for i in range(0, nrLights.value):
+    lightname = libboblight.boblight_getlightname(boblight,i)
+    print "boblight: " + lightname
 
 while not xbmc.abortRequested:
-  boblight = c_void_p(libboblight.boblight_init(None))
-  global current_priority
-  current_priority = -1
+  initGlobals()
 
-  print "boblight: connecting to boblightd"
-  returnv = c_int(libboblight.boblight_connect(boblight, None, -1, 1000000))
+  boblight = c_void_p(libboblight.boblight_init(None))
+  hostip = __settings__.getSetting("hostip")
+  hostport = int(__settings__.getSetting("hostport"))
+
+  if not __settings__.getSetting("networkaccess"):
+    hostip = None
+    hostport = -1
+
+  if hostip == None:
+    print "boblight: connecting to local boblightd"
+  else:
+    print "boblight: connecting to boblightd " + hostip + ":" + str(hostport)
+  returnv = c_int(libboblight.boblight_connect(boblight, hostip, hostport, 1000000))
   if returnv.value == 0:
     print "boblight: connection to boblightd failed: " + c_char_p(libboblight.boblight_geterror(boblight)).value
     count = 10
@@ -96,9 +262,10 @@ while not xbmc.abortRequested:
       count -= 1
   else:
     print "boblight: connected to boblightd"
-    libboblight.boblight_setoption(boblight, -1, "saturation 3.0")
-    libboblight.boblight_setoption(boblight, -1, "value      10.0")
-    libboblight.boblight_setoption(boblight, -1, "speed      20.0")
+    printLights(boblight)
+    print "boblight: setting up with user settings"
+#fixme with category - movie hardcoded for now
+    setup(boblight,"movie")
     process_boblight(boblight)
 
   libboblight.boblight_destroy(boblight)
@@ -163,3 +330,4 @@ while (not xbmc.abortRequested):
 
   gtk.main_iteration(False)
 """
+
