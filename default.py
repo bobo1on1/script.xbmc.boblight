@@ -65,7 +65,7 @@ def process_boblight(boblight):
   capture = xbmc.RenderCapture()
   capture.capture(capture_width, capture_height, xbmc.CAPTURE_FLAG_CONTINUOUS)
   while not xbmc.abortRequested:
-#    checkForNewSettings(boblight)						#fixme - settings can't be updated this way ... xbmc doesn't support it yet
+    checkForNewSettings(boblight)
     capture.waitForCaptureStateChangeEvent(1000)
     if capture.getCaptureState() == xbmc.CAPTURE_STATE_DONE:
       if not set_priority(boblight, 128):
@@ -93,6 +93,7 @@ def process_boblight(boblight):
 
 #-------------------START handle settings functions--------------------
 def checkForNewSettings(boblight):
+#todo  for now impl. stat on addon.getAddonInfo('profile')/settings.xml and use mtime
 #check for new settings every 5 secs
   global g_timer
   if time.time() - g_timer > 5:
