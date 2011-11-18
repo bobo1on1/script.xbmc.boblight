@@ -72,12 +72,17 @@ def bob_loadLibBoblight():
   g_current_priority = -1
 
   if HAVE_CTYPES:
+    libname = "libboblight.so" #default to linux type
     # load g_libboblight.so/dylib
     try:
       if xbmc.getCondVisibility('system.platform.ios') or xbmc.getCondVisibility('system.platform.osx'):
-        dylib = xbmc.translatePath( os.path.join( __cwd__, 'resources', 'lib', 'libboblight.dylib') )
-        cdll.LoadLibrary(dylib)
-        g_libboblight = CDLL(dylib)
+        libname = xbmc.translatePath( os.path.join( __cwd__, 'resources', 'lib', 'libboblight.dylib') )
+        cdll.LoadLibrary(libname)
+        g_libboblight = CDLL(libname)
+      elif xbmc.getCondVisibility('system.platform.windows'): 
+        libname = xbmc.translatePath( os.path.join( __cwd__, 'resources', 'lib', 'libboblight.dll') )
+        cdll.LoadLibrary(libname)
+        g_libboblight = CDLL(libname)
       else:
         cdll.LoadLibrary("libboblight.so")
         g_libboblight = CDLL("libboblight.so")
@@ -89,11 +94,7 @@ def bob_loadLibBoblight():
       g_bobHandle = c_void_p(g_libboblight.boblight_init(None))
     except:
       g_boblightLoaded = False
-      if xbmc.getCondVisibility('system.platform.ios') or xbmc.getCondVisibility('system.platform.osx'):
-        dylib = xbmc.translatePath( os.path.join( __cwd__, 'resources', 'lib', 'libboblight.dylib') )
-        print "boblight: Error loading " + dylib + " - only demo mode."
-      else:  
-        print "boblight: Error loading libboblight.so - only demo mode."
+      print "boblight: Error loading " + libname + " - only demo mode."
   else:
     print "boblight: No ctypes available - only demo mode."
     g_boblightLoaded = False
