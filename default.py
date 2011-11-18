@@ -115,7 +115,7 @@ while not xbmc.abortRequested:
     printLights()
     print "boblight: setting up with user settings"
 #fixme with category - movie hardcoded for now
-    settings_setup("movie")
+    settings_setup()
     process_boblight()
 
   time.sleep(1)

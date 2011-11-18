@@ -20,6 +20,7 @@ global g_autospeed
 global g_interpolation 
 global g_threshold
 global g_timer
+global g_category
 
 def settings_initGlobals():
   global g_networkaccess
@@ -35,6 +36,7 @@ def settings_initGlobals():
   global g_hostip
   global g_hostport  
   global g_timer
+  global g_category
 
   g_networkaccess  = False
   g_hostip         = "127.0.0.1"
@@ -49,6 +51,7 @@ def settings_initGlobals():
   g_hostip         = __settings__.getSetting("hostip")
   g_hostport       = int(__settings__.getSetting("hostport"))  
   g_timer          = time.time()
+  g_category       = "movie"
   
   if not g_networkaccess:
     g_hostip   = None
@@ -61,6 +64,24 @@ def settings_getHostIp():
 def settings_getHostPort():
   global g_hostport
   return g_hostport 
+
+def settings_getSettingCategory():                 
+  ret = "other"
+
+  duration = xbmc.getInfoLabel("VideoPlayer.Duration")
+  
+  if duration:		#we play something
+    ret = "movie"
+                                                                                                                                                                                                                
+    album = xbmc.getInfoLabel("VideoPlayer.Album")
+    print "Album: " + album                                                                                                                                                                                      
+                                                                                                                                                                                                                 
+    artist = xbmc.getInfoLabel("VideoPlayer.Artist")                                                                                                                                                                                           
+    print "Artist: " + artist                                                                                                                                                                                    
+    
+    if album != "" or artist != "":    
+      ret = "musicvideo"
+  return ret
   
 def settings_checkForNewSettings():
 #todo  for now impl. stat on addon.getAddonInfo('profile')/settings.xml and use mtime
@@ -70,7 +91,7 @@ def settings_checkForNewSettings():
 
   if time.time() - g_timer > 5:
     print "boblight: checking for new settings"
-    if settings_setup("movie"):			#fixme category
+    if settings_setup():
       reconnect = True
     g_timer = time.time()
   return reconnect
@@ -136,7 +157,7 @@ def settings_setupForOther():
   threshold       =  float(__settings__.getSetting("other_threshold"))
   return (saturation,value,speed,autospeed,interpolation,threshold)
 
-def settings_setup(category):
+def settings_setup():
   global g_networkaccess
   global g_hostip
   global g_hostport
@@ -148,6 +169,7 @@ def settings_setup(category):
   global g_threshold
   global g_timer
   global g_failedConnectionNotified
+  global g_category
   reconnect = False
 
 #switch case in python - dictionary with function pointers
@@ -156,8 +178,13 @@ def settings_setup(category):
              "other"      : settings_setupForOther,
   }
 #call the right setup function according to categroy
+  category = settings_getSettingCategory()
   saturation,value,speed,autospeed,interpolation,threshold = option[category]()
-
+  
+  if g_category != category:
+    print "boblight: use settings for " + category
+    g_category = category
+ 
   networkaccess = __settings__.getSetting("networkaccess") == "true"
   hostip = __settings__.getSetting("hostip")
   hostport = int(__settings__.getSetting("hostport"))

@@ -29,17 +29,17 @@ __cwd__ = sys.modules[ "__main__" ].__cwd__
 __icon__ = sys.modules[ "__main__" ].__icon__
 __scriptname__ = sys.modules[ "__main__" ].__scriptname__
 
-try:
-  from ctypes import *
-  HAVE_CTYPES = True
-except:
-  HAVE_CTYPES = False
-
 global g_boblightLoaded
 global g_bobHandle
 global g_current_priority
 global g_libboblight
 global g_connected
+
+try:
+  from ctypes import *
+  HAVE_CTYPES = True
+except:
+  HAVE_CTYPES = False
 
 def bob_loadLibBoblight():
   global g_boblightLoaded
@@ -67,6 +67,7 @@ def bob_loadLibBoblight():
       print "boblight: Error loading g_libboblight.so - only demo mode."
   else:
     print "boblight: No ctypes available - only demo mode."
+    g_boblightLoaded = False
 
 def bob_set_priority(priority):
   global g_current_priority
@@ -105,10 +106,13 @@ def bob_setoption(option):
   return ret
   
 def bob_getnrlights():
-  ret = c_int(0)
-  if g_boblightLoaded and g_connected:
-    ret = c_int(g_libboblight.boblight_getnrlights(g_bobHandle))
-  return ret.value
+  if HAVE_CTYPES:
+    ret = c_int(0)
+    if g_boblightLoaded and g_connected:
+      ret = c_int(g_libboblight.boblight_getnrlights(g_bobHandle))
+    return ret.value
+  else:
+    return 0
   
 def bob_getlightname(nr):
   ret = ""
@@ -119,10 +123,6 @@ def bob_getlightname(nr):
 def bob_connect(hostip, hostport):
   global g_connected
   
-  if hostip != None:
-    print "connect to " + hostip + "/" + str(hostport) + " loaded " + str(g_boblightLoaded)
-  else:
-    print "connect to None/" + str(hostport) + " loaded " + str(g_boblightLoaded)
   if g_boblightLoaded:
     ret = c_int(g_libboblight.boblight_connect(g_bobHandle, hostip, hostport, 1000000))
     g_connected = ret.value != 0
