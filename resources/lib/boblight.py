@@ -118,9 +118,15 @@ def bob_getlightname(nr):
 
 def bob_connect(hostip, hostport):
   global g_connected
-
+  
+  if hostip != None:
+    print "connect to " + hostip + "/" + str(hostport) + " loaded " + str(g_boblightLoaded)
+  else:
+    print "connect to None/" + str(hostport) + " loaded " + str(g_boblightLoaded)
   if g_boblightLoaded:
-    g_connected = c_int(g_libboblight.boblight_connect(g_bobHandle, hostip, hostport, 1000000)) != 0
+    ret = c_int(g_libboblight.boblight_connect(g_bobHandle, hostip, hostport, 1000000))
+    g_connected = ret.value != 0
+    print str(ret) + " " + str(ret.value)
   else:
     g_connected = True
   return g_connected
