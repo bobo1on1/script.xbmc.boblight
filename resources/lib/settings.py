@@ -86,18 +86,12 @@ def settings_getHostPort():
 def settings_getSettingCategory():                 
   ret = "other"
 
-  duration = xbmc.getInfoLabel("VideoPlayer.Duration")
-  
-  if duration:		#we play something
+  playing = xbmc.getCondVisibility("Player.HasVideo")
+
+  if playing:		#we play something
     ret = "movie"
-                                                                                                                                                                                                                
-    album = xbmc.getInfoLabel("VideoPlayer.Album")
-    print "Album: " + album                                                                                                                                                                                      
-                                                                                                                                                                                                                 
-    artist = xbmc.getInfoLabel("VideoPlayer.Artist")                                                                                                                                                                                           
-    print "Artist: " + artist                                                                                                                                                                                    
-    
-    if album != "" or artist != "":    
+    musicvideo = xbmc.getCondVisibility("VideoPlayer.Content(musicvideos)")
+    if musicvideo:
       ret = "musicvideo"
   return ret
   

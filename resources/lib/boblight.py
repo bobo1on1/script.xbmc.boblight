@@ -38,8 +38,10 @@ c_int(g_libboblight.boblight_sendrgb(boblight, int sync, int* outputused))
 c_int(g_libboblight.boblight_ping(boblight, int* outputused))
 
 """
-
+import platform
+import xbmc
 import sys
+import os
 
 __scriptname__ = sys.modules[ "__main__" ].__scriptname__
 __settings__ = sys.modules[ "__main__" ].__settings__
@@ -70,10 +72,15 @@ def bob_loadLibBoblight():
   g_current_priority = -1
 
   if HAVE_CTYPES:
-    # load g_libboblight.so
+    # load g_libboblight.so/dylib
     try:
-      cdll.LoadLibrary("libboblight.so")
-      g_libboblight = CDLL("libboblight.so")
+      if xbmc.getCondVisibility('system.platform.ios') or xbmc.getCondVisibility('system.platform.osx'):
+        dylib = xbmc.translatePath( os.path.join( __cwd__, 'resources', 'lib', 'libboblight.dylib') )
+        cdll.LoadLibrary(dylib)
+        g_libboblight = CDLL(dylib)
+      else:
+        cdll.LoadLibrary("libboblight.so")
+        g_libboblight = CDLL("libboblight.so")
       g_libboblight.boblight_init.restype = c_void_p
       g_libboblight.boblight_geterror.restype = c_char_p
       g_libboblight.boblight_getlightname.restype = c_char_p
@@ -82,7 +89,11 @@ def bob_loadLibBoblight():
       g_bobHandle = c_void_p(g_libboblight.boblight_init(None))
     except:
       g_boblightLoaded = False
-      print "boblight: Error loading g_libboblight.so - only demo mode."
+      if xbmc.getCondVisibility('system.platform.ios') or xbmc.getCondVisibility('system.platform.osx'):
+        dylib = xbmc.translatePath( os.path.join( __cwd__, 'resources', 'lib', 'libboblight.dylib') )
+        print "boblight: Error loading " + dylib + " - only demo mode."
+      else:  
+        print "boblight: Error loading libboblight.so - only demo mode."
   else:
     print "boblight: No ctypes available - only demo mode."
     g_boblightLoaded = False
