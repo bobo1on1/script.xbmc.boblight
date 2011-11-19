@@ -163,7 +163,7 @@ def bob_connect(hostip, hostport):
 
 def bob_destroy():
   if g_boblightLoaded:
-    g_libboblight.boblight_destroy(boblight)
+    g_libboblight.boblight_destroy(g_bobHandle)
 
 def bob_geterror():
   ret = ""
