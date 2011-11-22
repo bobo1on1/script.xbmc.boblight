@@ -9,6 +9,7 @@
   <string id="101">Use remote boblightd</string>
   <string id="102">Boblightd IP</string>
   <string id="103">Boblightd Port</string>
+  <string id="104">Disable boblight</string>
 
   <!--Movie/MusicVideo/Other-->
   <string id="200">Movie</string>
@@ -33,6 +34,12 @@
   
   <!--Other-->
   <string id="400">Other</string>
+  
+  <!--Notifications-->
+  <string id="500">Failed to connect to boblightd!</string>
+  <string id="501">Connected to boblightd!</string>
+  <string id="502">Settings changed!</string>
+  <string id="503">Boblight is disabled!</string>
 </strings>
 
 

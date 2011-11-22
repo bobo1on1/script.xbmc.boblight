@@ -4,6 +4,7 @@
 	<setting id="networkaccess" type="bool" label="101" default="false" />
 	<setting id="hostip" type="ipaddress" subsetting="true" enable="eq(-1,true)" label="102" default="127.0.0.1" />
 	<setting id="hostport" type="number" subsetting="true" enable="eq(-2,true)" label="103" default="19333" />
+	<setting id="bobdisable" type="bool" label="104" default="false" />
     </category>
     <category label="200">
 	<setting id="movie_preset" type="enum" label="201" default="1" lvalues="220|221|222" />

@@ -119,6 +119,10 @@ def bob_addpixelxy(x,y,rgb):
   if g_boblightLoaded and g_connected:
     g_libboblight.boblight_addpixelxy(g_bobHandle, x, y, rgb)
 
+def bob_addpixel(rgb):
+  if g_boblightLoaded and g_connected:
+    g_libboblight.boblight_addpixel(g_bobHandle, -1, rgb)
+
 def bob_sendrgb():
   ret = False
   if g_boblightLoaded and g_connected:
@@ -156,10 +160,14 @@ def bob_connect(hostip, hostport):
   if g_boblightLoaded:
     ret = c_int(g_libboblight.boblight_connect(g_bobHandle, hostip, hostport, 1000000))
     g_connected = ret.value != 0
-    print str(ret) + " " + str(ret.value)
   else:
     g_connected = True
   return g_connected
+  
+def bob_set_static_color(rgb):
+  if g_boblightLoaded and g_connected:
+    bob_addpixel(rgb)
+    bob_sendrgb()
 
 def bob_destroy():
   if g_boblightLoaded:

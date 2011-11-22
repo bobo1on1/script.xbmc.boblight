@@ -45,6 +45,11 @@ def process_boblight():
   while not xbmc.abortRequested:
     if settings_checkForNewSettings():
       reconnectBoblight()
+    if settings_getBobDisable():
+      bob_set_priority(255)
+      time.sleep(1)
+      continue
+      
     capture.waitForCaptureStateChangeEvent(1000)
     if capture.getCaptureState() == xbmc.CAPTURE_STATE_DONE:
       if not bob_set_priority(128):
@@ -84,6 +89,19 @@ def printLights():
     lightname = bob_getlightname(i)
     print "boblight: " + lightname
 
+def showRgbBobInit():
+  bob_set_priority(128)   #allow lights to be turned on
+  rgb = (c_int * 3)(255,0,0)
+  bob_set_static_color(byref(rgb))
+  time.sleep(1)
+  rgb = (c_int * 3)(0,255,0)
+  bob_set_static_color(byref(rgb))
+  time.sleep(1)
+  rgb = (c_int * 3)(0,0,255)
+  bob_set_static_color(byref(rgb))
+  time.sleep(1)
+  bob_set_priority(255) #turn the lights off 
+
 def reconnectBoblight():
   global g_failedConnectionNotified
   
@@ -111,15 +129,14 @@ def reconnectBoblight():
         count -= 1
       if not g_failedConnectionNotified:
         g_failedConnectionNotified = True
-        text = "Failed to connect to boblightd!"
+        text = __settings__.getLocalizedString(500)
         xbmc.executebuiltin("XBMC.Notification(%s,%s,%s,%s)" % (__scriptname__,text,10,__icon__))
     else:
-      text = "Connected to boblightd!"
+      text = __settings__.getLocalizedString(501)
       xbmc.executebuiltin("XBMC.Notification(%s,%s,%s,%s)" % (__scriptname__,text,10,__icon__))
       print "boblight: connected to boblightd"
       break
   return True
-
 
 #MAIN - entry point
 initGlobals()
@@ -133,6 +150,7 @@ while not xbmc.abortRequested:
     print "boblight: setting up with user settings"
 #fixme with category - movie hardcoded for now
     settings_setup()
+    showRgbBobInit()
     process_boblight()
 
   time.sleep(1)

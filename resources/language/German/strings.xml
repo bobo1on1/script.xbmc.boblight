@@ -9,6 +9,7 @@
   <string id="101">Benutze boblight über Netzwerk</string>
   <string id="102">Boblightd IP</string>
   <string id="103">Boblightd Port</string>
+  <string id="104">Boblight ausschalten</string>
 
   <!--Movie/MusicVideo/Other-->
   <string id="200">Film</string>
@@ -33,6 +34,10 @@
   
   <!--Other-->
   <string id="400">Sonstige</string>
+
+  <!--Notifications-->                                                                                                                                                                                           
+  <string id="500">Fehler beim Verbinden zu boblightd!</string>                                                                                                                                                      
+  <string id="501">Verbunden mit boblightd!</string>                                                                                                                                                              
+  <string id="502">Einstellungen geaendert!</string>
+  <string id="503">Boblight wurde ausgeschaltet!</string> 
 </strings>
-
-

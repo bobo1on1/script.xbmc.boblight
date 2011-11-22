@@ -39,6 +39,7 @@ global g_interpolation
 global g_threshold
 global g_timer
 global g_category
+global g_bobdisable
 
 def settings_initGlobals():
   global g_networkaccess
@@ -55,6 +56,7 @@ def settings_initGlobals():
   global g_hostport  
   global g_timer
   global g_category
+  global g_bobdisable
 
   g_networkaccess  = False
   g_hostip         = "127.0.0.1"
@@ -70,6 +72,7 @@ def settings_initGlobals():
   g_hostport       = int(__settings__.getSetting("hostport"))  
   g_timer          = time.time()
   g_category       = "movie"
+  g_bobdisable     = __settings__.getSetting("bobdisable") == "true"
   
   if not g_networkaccess:
     g_hostip   = None
@@ -82,6 +85,10 @@ def settings_getHostIp():
 def settings_getHostPort():
   global g_hostport
   return g_hostport 
+
+def settings_getBobDisable():
+  global g_bobdisable
+  return g_bobdisable
 
 def settings_getSettingCategory():                 
   ret = "other"
@@ -129,7 +136,7 @@ def settings_setupForMovie():
     value           =  float(__settings__.getSetting("movie_value"))
     speed           =  float(__settings__.getSetting("movie_speed"))
     autospeed       =  float(__settings__.getSetting("movie_autospeed"))
-    interpolation   =  int(bool(__settings__.getSetting("movie_interpolation")))
+    interpolation   =  __settings__.getSetting("movie_interpolation") == "true"
     threshold       =  float(__settings__.getSetting("movie_threshold"))
   return (saturation,value,speed,autospeed,interpolation,threshold)
 
@@ -155,7 +162,7 @@ def settings_setupForMusicVideo():
     value           =  float(__settings__.getSetting("musicvideo_value"))
     speed           =  float(__settings__.getSetting("musicvideo_speed"))
     autospeed       =  float(__settings__.getSetting("movie_autospeed"))
-    interpolation   =  int(bool(__settings__.getSetting("musicvideo_interpolation")))
+    interpolation   =  __settings__.getSetting("musicvideo_interpolation") == "true"
     threshold       =  float(__settings__.getSetting("musicvideo_threshold"))
   return (saturation,value,speed,autospeed,interpolation,threshold)
 
@@ -164,7 +171,7 @@ def settings_setupForOther():
   value           =  float(__settings__.getSetting("other_value"))
   speed           =  float(__settings__.getSetting("other_speed"))
   autospeed       =  float(__settings__.getSetting("movie_autospeed"))
-  interpolation   =  int(bool(__settings__.getSetting("other_interpolation")))
+  interpolation   =  __settings__.getSetting("other_interpolation") == "true"
   threshold       =  float(__settings__.getSetting("other_threshold"))
   return (saturation,value,speed,autospeed,interpolation,threshold)
 
@@ -181,7 +188,11 @@ def settings_setup():
   global g_timer
   global g_failedConnectionNotified
   global g_category
+  global g_bobdisable
   reconnect = False
+  settingChanged = False
+  categoryChanged = False
+  bobdisable  = __settings__.getSetting("bobdisable") == "true"
 
 #switch case in python - dictionary with function pointers
   option = { "movie"      : settings_setupForMovie,
@@ -193,6 +204,7 @@ def settings_setup():
   saturation,value,speed,autospeed,interpolation,threshold = option[category]()
   
   if g_category != category:
+    categoryChanged = True				#don't change notify when category changes
     print "boblight: use settings for " + category
     g_category = category
  
@@ -225,32 +237,51 @@ def settings_setup():
 #setup boblight - todo error checking
   if g_saturation != saturation:  
     ret = bob_setoption("saturation    " + str(saturation))
+    settingChanged = True
     print "boblight: changed saturation to " + str(saturation) + "(ret " + str(ret) + ")"
     g_saturation = saturation
   
   if g_value != value:  
     ret = bob_setoption("value         " + str(value))
+    settingChanged = True
     print "boblight: changed value to " + str(value) + "(ret " + str(ret) + ")"
     g_value = value
 
   if g_speed != speed:  
     ret = bob_setoption("speed         " + str(speed))
+    settingChanged = True
     print "boblight: changed speed to " + str(speed) + "(ret " + str(ret) + ")"
     g_speed = speed
 
   if g_autospeed != autospeed:  
     ret = bob_setoption("autospeed     " + str(autospeed))
+    settingChanged = True
     print "boblight: changed autospeed to " + str(autospeed) + "(ret " + str(ret) + ")"
     g_autospeed = autospeed
 
   if g_interpolation != interpolation:  
     ret = bob_setoption("interpolation " + str(interpolation))
+    settingChanged = True
     print "boblight: changed interpolation to " + str(interpolation) + "(ret " + str(ret) + ")"
     g_interpolation = interpolation
 
   if g_threshold != threshold:  
     ret = bob_setoption("threshold     " + str(threshold))
+    settingChanged = True
     print "boblight: changed threshold to " + str(threshold) + "(ret " + str(ret) + ")"
     g_threshold = threshold
+    
+  if g_bobdisable != bobdisable:
+    if bobdisable:
+      text = __settings__.getLocalizedString(503)
+      xbmc.executebuiltin("XBMC.Notification(%s,%s,%s,%s)" % (__scriptname__,text,10,__icon__))
+      print "boblight: boblight disabled"
+    else:
+      print "boblight: boblight enabled"
+    g_bobdisable = bobdisable
+
+  if settingChanged and not categoryChanged:
+    text = __settings__.getLocalizedString(502)
+    xbmc.executebuiltin("XBMC.Notification(%s,%s,%s,%s)" % (__scriptname__,text,10,__icon__))
 
   return reconnect
