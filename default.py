@@ -90,16 +90,20 @@ def printLights():
     print "boblight: " + lightname
 
 def showRgbBobInit():
+  settings_loadForBobInit()
   bob_set_priority(128)   #allow lights to be turned on
   rgb = (c_int * 3)(255,0,0)
   bob_set_static_color(byref(rgb))
-  time.sleep(1)
+  time.sleep(0.3)
   rgb = (c_int * 3)(0,255,0)
   bob_set_static_color(byref(rgb))
-  time.sleep(1)
+  time.sleep(0.3)
   rgb = (c_int * 3)(0,0,255)
   bob_set_static_color(byref(rgb))
-  time.sleep(1)
+  time.sleep(0.3)
+  rgb = (c_int * 3)(0,0,0)
+  bob_set_static_color(byref(rgb))
+  time.sleep(3)
   bob_set_priority(255) #turn the lights off 
 
 def reconnectBoblight():
@@ -148,9 +152,8 @@ while not xbmc.abortRequested:
   if reconnectBoblight():
     printLights()
     print "boblight: setting up with user settings"
-#fixme with category - movie hardcoded for now
-    settings_setup()
     showRgbBobInit()
+    settings_setup()
     process_boblight()
 
   time.sleep(1)

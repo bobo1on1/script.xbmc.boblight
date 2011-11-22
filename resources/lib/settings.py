@@ -72,7 +72,7 @@ def settings_initGlobals():
   g_hostport       = int(__settings__.getSetting("hostport"))  
   g_timer          = time.time()
   g_category       = "movie"
-  g_bobdisable     = __settings__.getSetting("bobdisable") == "true"
+  g_bobdisable     = -1
   
   if not g_networkaccess:
     g_hostip   = None
@@ -89,6 +89,20 @@ def settings_getHostPort():
 def settings_getBobDisable():
   global g_bobdisable
   return g_bobdisable
+
+def settings_loadForBobInit():
+  saturation    = 4.0
+  value         = 1.0
+  speed         = 35.0
+  autospeed     = 0.0 
+  interpolation = 1
+  threshold     = 0.0
+  bob_setoption("saturation    " + str(saturation))
+  bob_setoption("value         " + str(value))
+  bob_setoption("speed         " + str(speed))
+  bob_setoption("autospeed     " + str(autospeed))
+  bob_setoption("interpolation " + str(interpolation))
+  bob_setoption("threshold     " + str(threshold))
 
 def settings_getSettingCategory():                 
   ret = "other"
