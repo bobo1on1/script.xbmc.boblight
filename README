@@ -1,0 +1,6 @@
+This is the boblight addon for using the open source ambilight clone ( http://code.google.com/p/boblight/ ) from within XBMC.
+
+For accessing the settings during video playback just put the file script.xbmc.boblight.keymap.xml into your "userdata/keymaps" folder. 
+
+You can access the settings during playback by hitting the key "b" or "B". (Note: a former keymapping to that key will be overwritten by this keymap file. If there is a 
+conflict you just can change the mapped key to something else).
