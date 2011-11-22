@@ -70,6 +70,7 @@ def bob_loadLibBoblight():
 
   g_connected = False
   g_current_priority = -1
+  ret = 0
 
   if HAVE_CTYPES:
     libname = "libboblight.so" #default to linux type
@@ -95,9 +96,12 @@ def bob_loadLibBoblight():
     except:
       g_boblightLoaded = False
       print "boblight: Error loading " + libname + " - only demo mode."
+      ret = 1
   else:
     print "boblight: No ctypes available - only demo mode."
+    ret = 2
     g_boblightLoaded = False
+  return ret
 
 def bob_set_priority(priority):
   global g_current_priority
@@ -161,7 +165,7 @@ def bob_connect(hostip, hostport):
     ret = c_int(g_libboblight.boblight_connect(g_bobHandle, hostip, hostport, 1000000))
     g_connected = ret.value != 0
   else:
-    g_connected = True
+    g_connected = False
   return g_connected
   
 def bob_set_static_color(rgb):

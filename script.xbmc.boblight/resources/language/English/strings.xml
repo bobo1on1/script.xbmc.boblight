@@ -40,6 +40,11 @@
   <string id="501">Connected to boblightd!</string>
   <string id="502">Settings changed!</string>
   <string id="503">Boblight is disabled!</string>
+  <string id="504">This addon needs a binary library. Please read</string>
+  <string id="505">the README file</string>
+  <string id="506">for getting some more instructions.</string>
+  <string id="507">This addon can't be run on that</string>
+  <string id="508">operating system! (missing ctypes module)</string> 
 </strings>
 
 

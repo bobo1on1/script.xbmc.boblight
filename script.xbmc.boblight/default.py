@@ -17,6 +17,7 @@
 '''
 import xbmc
 import xbmcaddon
+import xbmcgui
 import time
 import os
 
@@ -144,19 +145,29 @@ def reconnectBoblight():
 
 #MAIN - entry point
 initGlobals()
-bob_loadLibBoblight()
-  
-#main loop
-while not xbmc.abortRequested:
+loaded = bob_loadLibBoblight()
 
-  if reconnectBoblight():
-    printLights()
-    print "boblight: setting up with user settings"
-    showRgbBobInit()
-    settings_setup()
-    process_boblight()
+if loaded == 1:			#libboblight not found
+  t1 = __settings__.getLocalizedString(504)
+  t2 = __settings__.getLocalizedString(505)
+  t3 = __settings__.getLocalizedString(506)
+  xbmcgui.Dialog().ok(__scriptname__,t1,t2,t3)
+elif loaded == 2:		#no ctypes available
+  t1 = __settings__.getLocalizedString(507)
+  t2 = __settings__.getLocalizedString(508)
+  xbmcgui.Dialog().ok(__scriptname__,t1,t2) 
+else:
+  #main loop
+  while not xbmc.abortRequested:
 
-  time.sleep(1)
+    if reconnectBoblight():
+      printLights()
+      print "boblight: setting up with user settings"
+      showRgbBobInit()
+      settings_setup()
+      process_boblight()
+
+    time.sleep(1)
 
 #cleanup
 bob_destroy()

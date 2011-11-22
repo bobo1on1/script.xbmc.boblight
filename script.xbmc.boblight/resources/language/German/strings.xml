@@ -40,4 +40,9 @@
   <string id="501">Verbunden mit boblightd!</string>                                                                                                                                                              
   <string id="502">Einstellungen geaendert!</string>
   <string id="503">Boblight wurde ausgeschaltet!</string> 
+  <string id="504">Dieses Addon benoetigt eine binaere Bibliothek. Bitte lesen Sie</string> 
+  <string id="505">die README Datei </string>
+  <string id="506">fuer weitere Hilfe.</string>                            
+  <string id="507">Dieses Addon kann auf Ihrem Betriebssystem nicht</string>
+  <string id="508">ausgefuehrt werden! (Das ctypes Modul fehlt)</string> 
 </strings>
