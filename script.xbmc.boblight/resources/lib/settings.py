@@ -386,7 +386,7 @@ def settings_setup():
   category = settings_getSettingCategory()
   categoryChanged = settings_handleCategory(category)
   reconnect = settings_handleNetworkSettings()
-  settingsChanged = settings_handleGlobalSettings(category)
+  settingChanged = settings_handleGlobalSettings(category)
   settings_handleStaticBgSettings(category)
   settings_handleDisableSetting()
 
