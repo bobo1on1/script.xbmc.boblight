@@ -31,6 +31,7 @@ sys.path.append (BASE_RESOURCE_PATH)
 
 from boblight import *
 from settings import *
+from tools import *
 
 #if __settings__.getSetting('enabled') != 'true':
 #  exit(0)
@@ -150,10 +151,18 @@ initGlobals()
 loaded = bob_loadLibBoblight()
 
 if loaded == 1:			#libboblight not found
-  t1 = __settings__.getLocalizedString(504)
-  t2 = __settings__.getLocalizedString(505)
-  t3 = __settings__.getLocalizedString(506)
-  xbmcgui.Dialog().ok(__scriptname__,t1,t2,t3)
+#ask user if we should fetch the lib for osx and windows
+  if xbmc.getCondVisibility('system.platform.osx') or xbmc.getCondVisibility('system.platform.windows'):
+	t1 = __settings__.getLocalizedString(504)
+  	t2 = __settings__.getLocalizedString(509)
+  	if xbmcgui.Dialog().yesno(__scriptname__,t1,t2):
+  	  tools_downloadLibBoblight()
+  
+  if xbmc.getCondVisibility('system.platform.linux'):
+    t1 = __settings__.getLocalizedString(504)
+    t2 = __settings__.getLocalizedString(505)
+    t3 = __settings__.getLocalizedString(506)
+    xbmcgui.Dialog().ok(__scriptname__,t1,t2,t3)
 elif loaded == 2:		#no ctypes available
   t1 = __settings__.getLocalizedString(507)
   t2 = __settings__.getLocalizedString(508)

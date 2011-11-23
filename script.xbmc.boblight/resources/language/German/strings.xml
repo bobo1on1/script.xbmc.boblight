@@ -10,6 +10,8 @@
   <string id="102">Boblightd IP</string>
   <string id="103">Boblightd Port</string>
   <string id="104">Boblight ausschalten</string>
+  <string id="105">Erzwinge benutzte Kategorie</string>                                                                                                                                                              
+  <string id="106">Kategorie</string>
 
   <!--Movie/MusicVideo/Other-->
   <string id="200">Film</string>
@@ -44,9 +46,10 @@
   <string id="501">Verbunden mit boblightd!</string>
   <string id="502">Einstellungen geaendert!</string>
   <string id="503">Boblight wurde ausgeschaltet!</string>
-  <string id="504">Dieses Addon benoetigt eine binaere Bibliothek. Bitte lesen Sie</string>
-  <string id="505">die README Datei </string>
+  <string id="504">Dieses Addon benoetigt eine binaere Bibliothek.</string>
+  <string id="505">Bitte lesen Sie die README Datei.</string>
   <string id="506">fuer weitere Hilfe.</string>
   <string id="507">Dieses Addon kann auf Ihrem Betriebssystem nicht</string>
   <string id="508">ausgefuehrt werden! (Das ctypes Modul fehlt)</string>
+  <string id="509">Soll versucht werden diese automatisch herunterzuladen?</string>
 </strings>

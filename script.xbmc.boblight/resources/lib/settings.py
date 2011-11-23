@@ -23,7 +23,6 @@ __scriptname__ = sys.modules[ "__main__" ].__scriptname__
 __settings__   = sys.modules[ "__main__" ].__settings__
 __cwd__        = sys.modules[ "__main__" ].__cwd__
 __icon__       = sys.modules[ "__main__" ].__icon__
-__scriptname__ = sys.modules[ "__main__" ].__scriptname__
 sys.path.append (__cwd__)
 
 from boblight import *
@@ -43,6 +42,8 @@ global g_timer
 global g_category
 global g_bobdisable
 global g_staticBobActive
+global g_overwrite_cat
+global g_overwrite_cat_val
 
 #init globals with defaults
 def settings_initGlobals():
@@ -62,6 +63,8 @@ def settings_initGlobals():
   global g_category
   global g_bobdisable
   global g_staticBobActive
+  global g_overwrite_cat
+  global g_overwrite_cat_val
 
   g_networkaccess  = False
   g_hostip         = "127.0.0.1"
@@ -79,6 +82,8 @@ def settings_initGlobals():
   g_category       = "movie"
   g_bobdisable     = -1
   g_staticBobActive = False
+  g_overwrite_cat = False
+  g_overwrite_cat_val = 0
   
   if not g_networkaccess:
     g_hostip   = None
@@ -122,6 +127,13 @@ def settings_getSettingCategory():
     musicvideo = xbmc.getCondVisibility("VideoPlayer.Content(musicvideos)")
     if musicvideo:
       ret = "musicvideo"
+
+  if g_overwrite_cat and ret != "other":				#fix his out when other isn't the static light anymore
+    if g_overwrite_cat_val == 0:
+      ret = "movie"
+    else:
+      ret = "musicvideo"
+
   return ret
   
 #check for new settings and handle them if anything changed
@@ -211,7 +223,7 @@ def settings_setupForOther():
 def settings_setupForStatic():
   saturation    = 4.0
   value         = 1.0
-  speed         = 35.0
+  speed         = 50.0
   autospeed     = 0.0 
   interpolation = 1
   threshold     = 0.0
@@ -361,10 +373,15 @@ def settings_handleDisableSetting():
 
 #handles all settings of boblight and applies them as needed
 #returns if a reconnect is needed due to settings changes
-def settings_setup():   
+def settings_setup():  
+  global g_overwrite_cat
+  global g_overwrite_cat_val
   reconnect = False
   settingChanged = False
   categoryChanged = False
+
+  g_overwrite_cat = __settings__.getSetting("overwrite_cat") == "true"
+  g_overwrite_cat_val = int(__settings__.getSetting("overwrite_cat_val"))
 
   category = settings_getSettingCategory()
   categoryChanged = settings_handleCategory(category)

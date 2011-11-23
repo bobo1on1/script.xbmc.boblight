@@ -47,7 +47,6 @@ __scriptname__ = sys.modules[ "__main__" ].__scriptname__
 __settings__ = sys.modules[ "__main__" ].__settings__
 __cwd__ = sys.modules[ "__main__" ].__cwd__
 __icon__ = sys.modules[ "__main__" ].__icon__
-__scriptname__ = sys.modules[ "__main__" ].__scriptname__
 
 global g_boblightLoaded
 global g_bobHandle

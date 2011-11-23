@@ -35,6 +35,10 @@
     <setting id="networkaccess" type="bool" label="101" default="false" />
     <setting id="hostip" type="ipaddress" subsetting="true" enable="eq(-1,true)" label="102" default="127.0.0.1" />
     <setting id="hostport" type="number" subsetting="true" enable="eq(-2,true)" label="103" default="19333" />
+    <setting id="sep1" type="sep" />
     <setting id="bobdisable" type="bool" label="104" default="false" />
+    <setting id="sep2" type="sep" />
+    <setting id="overwrite_cat" type="bool" label="105" default="false" />
+    <setting id="overwrite_cat_val" type="enum" subsetting="true" enable="eq(-1,true)" label="106" default="0" lvalues="200|300" />
   </category>
 </settings>
