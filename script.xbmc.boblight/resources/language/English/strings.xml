@@ -30,10 +30,14 @@
   
   <string id="320">Custom</string>
   <string id="321">Ballad</string>
-  <string id="322">Rock</string>  
+  <string id="322">Rock</string>
   
   <!--Other-->
   <string id="400">Other</string>
+  <string id="401">Static background light</string>
+  <string id="402">Red</string>
+  <string id="403">Green</string>
+  <string id="404">Blue</string>
   
   <!--Notifications-->
   <string id="500">Failed to connect to boblightd!</string>
@@ -44,7 +48,7 @@
   <string id="505">the README file</string>
   <string id="506">for getting some more instructions.</string>
   <string id="507">This addon can't be run on that</string>
-  <string id="508">operating system! (missing ctypes module)</string> 
+  <string id="508">operating system! (missing ctypes module)</string>
 </strings>
 
 

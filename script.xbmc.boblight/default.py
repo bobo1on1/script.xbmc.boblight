@@ -73,8 +73,9 @@ def process_boblight():
         print "boblight: error sending values: " + bob_geterror()
         return
     else:
-      if not bob_set_priority(255):
-        return
+      if not settings_isStaticBobActive():  #don't kill the lights in accident here
+        if not bob_set_priority(255):
+          return
 
 def initGlobals():
   global g_failedConnectionNotified
@@ -90,8 +91,9 @@ def printLights():
     lightname = bob_getlightname(i)
     print "boblight: " + lightname
 
+#do a initial bling bling with the lights
 def showRgbBobInit():
-  settings_loadForBobInit()
+  settings_confForBobInit()
   bob_set_priority(128)   #allow lights to be turned on
   rgb = (c_int * 3)(255,0,0)
   bob_set_static_color(byref(rgb))
@@ -161,11 +163,11 @@ else:
   while not xbmc.abortRequested:
 
     if reconnectBoblight():
-      printLights()
+      printLights()         #print found lights to debuglog
       print "boblight: setting up with user settings"
-      showRgbBobInit()
+      showRgbBobInit()      #init light bling bling
       settings_setup()
-      process_boblight()
+      process_boblight()    #boblight loop
 
     time.sleep(1)
 

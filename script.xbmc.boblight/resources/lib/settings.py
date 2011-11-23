@@ -28,9 +28,11 @@ sys.path.append (__cwd__)
 
 from boblight import *
 
+#general
 global g_networkaccess
 global g_hostip
 global g_hostport
+#movie/musicvideo/other
 global g_saturation 
 global g_value 
 global g_speed 
@@ -40,7 +42,9 @@ global g_threshold
 global g_timer
 global g_category
 global g_bobdisable
+global g_staticBobActive
 
+#init globals with defaults
 def settings_initGlobals():
   global g_networkaccess
   global g_hostip
@@ -57,6 +61,7 @@ def settings_initGlobals():
   global g_timer
   global g_category
   global g_bobdisable
+  global g_staticBobActive
 
   g_networkaccess  = False
   g_hostip         = "127.0.0.1"
@@ -73,6 +78,7 @@ def settings_initGlobals():
   g_timer          = time.time()
   g_category       = "movie"
   g_bobdisable     = -1
+  g_staticBobActive = False
   
   if not g_networkaccess:
     g_hostip   = None
@@ -90,13 +96,13 @@ def settings_getBobDisable():
   global g_bobdisable
   return g_bobdisable
 
-def settings_loadForBobInit():
-  saturation    = 4.0
-  value         = 1.0
-  speed         = 35.0
-  autospeed     = 0.0 
-  interpolation = 1
-  threshold     = 0.0
+def settings_isStaticBobActive():
+  global g_staticBobActive
+  return g_staticBobActive
+
+#configures boblight for the initial bling bling
+def settings_confForBobInit():
+  saturation,value,speed,autospeed,interpolation,threshold = settings_setupForStatic()
   bob_setoption("saturation    " + str(saturation))
   bob_setoption("value         " + str(value))
   bob_setoption("speed         " + str(speed))
@@ -104,6 +110,8 @@ def settings_loadForBobInit():
   bob_setoption("interpolation " + str(interpolation))
   bob_setoption("threshold     " + str(threshold))
 
+#returns the settings category based on the currently played media
+#returns "movie" if a movies is played, "musicvideo" if a musicvideo is played", "other" else
 def settings_getSettingCategory():                 
   ret = "other"
 
@@ -116,6 +124,9 @@ def settings_getSettingCategory():
       ret = "musicvideo"
   return ret
   
+#check for new settings and handle them if anything changed
+#only checks if the last check is 5 secs old
+#returns if a reconnect is needed due to settings change
 def settings_checkForNewSettings():
 #todo  for now impl. stat on addon.getAddonInfo('profile')/settings.xml and use mtime
 #check for new settings every 5 secs
@@ -123,11 +134,12 @@ def settings_checkForNewSettings():
   reconnect = False
 
   if time.time() - g_timer > 5:
-    if settings_setup():
-      reconnect = True
+    reconnect = settings_setup()
     g_timer = time.time()
   return reconnect
-        
+
+#handle boblight configuration from the "Movie" category
+#returns the new settings
 def settings_setupForMovie(): 
   preset = int(__settings__.getSetting("movie_preset"))
 
@@ -154,6 +166,8 @@ def settings_setupForMovie():
     threshold       =  float(__settings__.getSetting("movie_threshold"))
   return (saturation,value,speed,autospeed,interpolation,threshold)
 
+#handle boblight configuration from the "MusicVideo" category
+#returns the new settings
 def settings_setupForMusicVideo():
   preset = int(__settings__.getSetting("musicvideo_preset"))
 
@@ -180,53 +194,43 @@ def settings_setupForMusicVideo():
     threshold       =  float(__settings__.getSetting("musicvideo_threshold"))
   return (saturation,value,speed,autospeed,interpolation,threshold)
 
+#handle boblight configuration from the "other" category
+#returns the new settings
 def settings_setupForOther():
-  saturation      =  float(__settings__.getSetting("other_saturation"))
-  value           =  float(__settings__.getSetting("other_value"))
-  speed           =  float(__settings__.getSetting("other_speed"))
-  autospeed       =  float(__settings__.getSetting("movie_autospeed"))
-  interpolation   =  __settings__.getSetting("other_interpolation") == "true"
-  threshold       =  float(__settings__.getSetting("other_threshold"))
+# FIXME don't use them for now - reactivate when boblight works on non rendered scenes (e.x. menu)
+#  saturation      =  float(__settings__.getSetting("other_saturation"))
+#  value           =  float(__settings__.getSetting("other_value"))
+#  speed           =  float(__settings__.getSetting("other_speed"))
+#  autospeed       =  float(__settings__.getSetting("other_autospeed"))
+#  interpolation   =  __settings__.getSetting("other_interpolation") == "true"
+#  threshold       =  float(__settings__.getSetting("other_threshold"))
+  return settings_setupForStatic()
+
+#handle boblight configuration for static lights
+#returns the new settings
+def settings_setupForStatic():
+  saturation    = 4.0
+  value         = 1.0
+  speed         = 35.0
+  autospeed     = 0.0 
+  interpolation = 1
+  threshold     = 0.0
   return (saturation,value,speed,autospeed,interpolation,threshold)
 
-def settings_setup():
+  
+#handle all settings in the general tab according to network access
+#returns true if reconnect is needed due to network changes
+def settings_handleNetworkSettings():
   global g_networkaccess
   global g_hostip
   global g_hostport
-  global g_saturation 
-  global g_value 
-  global g_speed 
-  global g_autospeed 
-  global g_interpolation 
-  global g_threshold
-  global g_timer
-  global g_failedConnectionNotified
-  global g_category
-  global g_bobdisable
   reconnect = False
-  settingChanged = False
-  categoryChanged = False
-  bobdisable  = __settings__.getSetting("bobdisable") == "true"
 
-#switch case in python - dictionary with function pointers
-  option = { "movie"      : settings_setupForMovie,
-             "musicvideo" : settings_setupForMusicVideo,
-             "other"      : settings_setupForOther,
-  }
-#call the right setup function according to categroy
-  category = settings_getSettingCategory()
-  saturation,value,speed,autospeed,interpolation,threshold = option[category]()
-  
-  if g_category != category:
-    categoryChanged = True				#don't change notify when category changes
-    print "boblight: use settings for " + category
-    g_category = category
- 
   networkaccess = __settings__.getSetting("networkaccess") == "true"
-  hostip = __settings__.getSetting("hostip")
-  hostport = int(__settings__.getSetting("hostport"))
+  hostip        = __settings__.getSetting("hostip")
+  hostport      = int(__settings__.getSetting("hostport"))
 
-#server settings
+  #server settings
   #we need to reconnect if networkaccess bool changes
   #or if network access is enabled and ip or port have changed
   if g_networkaccess != networkaccess or ((g_hostip != hostip or g_hostport != hostport) and g_networkaccess) :
@@ -244,11 +248,51 @@ def settings_setup():
       if g_hostport != hostport:
         print "boblight: changed hostport to " + str(hostport)
         g_hostport = hostport
-  
-    g_failedConnectionNotified = False
-    reconnect = True
+      reconnect = True
+  return reconnect
 
-#setup boblight - todo error checking
+#handle all settings according to the static bg light
+#this is used until category "other" can do real boblight
+#when no video is rendered
+#category - the category we are in currently
+def settings_handleStaticBgSettings(category):
+  global g_staticBobActive
+  other_static_bg     = __settings__.getSetting("other_static_bg") == "true"
+  other_static_red    = int(float(__settings__.getSetting("other_static_red")))
+  other_static_green  = int(float(__settings__.getSetting("other_static_green")))
+  other_static_blue   = int(float(__settings__.getSetting("other_static_blue")))
+  
+  if category == "other" and other_static_bg and not g_bobdisable:#for now enable static light on other if settings want this
+    bob_set_priority(128)                                  #allow lights to be turned on
+    rgb = (c_int * 3)(other_static_red,other_static_green,other_static_blue)
+    bob_set_static_color(byref(rgb))
+    g_staticBobActive = True
+  else:
+    bob_set_priority(255)                                  #turn the lights off - will be turned on as needed in the mainloop
+    g_staticBobActive = False
+
+#handles the boblight configuration of all categorys
+#and applies changed settings to boblight
+#"movie","musicvideo" and "other
+#returns if a setting has been changed
+def settings_handleGlobalSettings(category):
+  global g_saturation 
+  global g_value 
+  global g_speed 
+  global g_autospeed 
+  global g_interpolation 
+  global g_threshold
+  settingChanged = False
+
+  #call the right setup function according to categroy
+  #switch case in python - dictionary with function pointers
+  option = { "movie"      : settings_setupForMovie,
+             "musicvideo" : settings_setupForMusicVideo,
+             "other"      : settings_setupForOther,
+  }
+  saturation,value,speed,autospeed,interpolation,threshold = option[category]()
+
+  #setup boblight - todo error checking
   if g_saturation != saturation:  
     ret = bob_setoption("saturation    " + str(saturation))
     settingChanged = True
@@ -284,6 +328,27 @@ def settings_setup():
     settingChanged = True
     print "boblight: changed threshold to " + str(threshold) + "(ret " + str(ret) + ")"
     g_threshold = threshold
+  return settingChanged
+
+#handle change of category we are in
+#"movie","musicvideo" or "other"
+#returns if category has changed  
+def settings_handleCategory(category):
+  global g_category
+  categoryChanged = False
+
+  if g_category != category:
+    categoryChanged = True				#don't change notify when category changes
+    print "boblight: use settings for " + category
+    g_category = category   
+  return categoryChanged
+
+#handle bob disable setting
+#sets the global g_bobdisable and prints
+#toast dialog on disable
+def settings_handleDisableSetting():
+  global g_bobdisable
+  bobdisable  = __settings__.getSetting("bobdisable") == "true"  
     
   if g_bobdisable != bobdisable:
     if bobdisable:
@@ -292,10 +357,26 @@ def settings_setup():
       print "boblight: boblight disabled"
     else:
       print "boblight: boblight enabled"
-    g_bobdisable = bobdisable
+    g_bobdisable = bobdisable 
 
+#handles all settings of boblight and applies them as needed
+#returns if a reconnect is needed due to settings changes
+def settings_setup():   
+  reconnect = False
+  settingChanged = False
+  categoryChanged = False
+
+  category = settings_getSettingCategory()
+  categoryChanged = settings_handleCategory(category)
+  reconnect = settings_handleNetworkSettings()
+  settingsChanged = settings_handleGlobalSettings(category)
+  settings_handleStaticBgSettings(category)
+  settings_handleDisableSetting()
+
+  #notify user via toast dialog when a setting was changed (beside category changes)
   if settingChanged and not categoryChanged:
     text = __settings__.getLocalizedString(502)
     xbmc.executebuiltin("XBMC.Notification(%s,%s,%s,%s)" % (__scriptname__,text,10,__icon__))
 
   return reconnect
+  

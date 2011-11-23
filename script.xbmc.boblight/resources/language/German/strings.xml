@@ -30,19 +30,23 @@
   
   <string id="320">Eigene</string>
   <string id="321">Ballade</string>
-  <string id="322">Rock</string>  
+  <string id="322">Rock</string>
   
   <!--Other-->
   <string id="400">Sonstige</string>
+  <string id="401">Festes Hintergrundlicht</string>
+  <string id="402">Rot</string>
+  <string id="403">Gruen</string>
+  <string id="404">Blau</string>  
 
   <!--Notifications-->                                                                                                                                                                                           
-  <string id="500">Fehler beim Verbinden zu boblightd!</string>                                                                                                                                                      
-  <string id="501">Verbunden mit boblightd!</string>                                                                                                                                                              
+  <string id="500">Fehler beim Verbinden zu boblightd!</string>
+  <string id="501">Verbunden mit boblightd!</string>
   <string id="502">Einstellungen geaendert!</string>
-  <string id="503">Boblight wurde ausgeschaltet!</string> 
-  <string id="504">Dieses Addon benoetigt eine binaere Bibliothek. Bitte lesen Sie</string> 
+  <string id="503">Boblight wurde ausgeschaltet!</string>
+  <string id="504">Dieses Addon benoetigt eine binaere Bibliothek. Bitte lesen Sie</string>
   <string id="505">die README Datei </string>
-  <string id="506">fuer weitere Hilfe.</string>                            
+  <string id="506">fuer weitere Hilfe.</string>
   <string id="507">Dieses Addon kann auf Ihrem Betriebssystem nicht</string>
-  <string id="508">ausgefuehrt werden! (Das ctypes Modul fehlt)</string> 
+  <string id="508">ausgefuehrt werden! (Das ctypes Modul fehlt)</string>
 </strings>
