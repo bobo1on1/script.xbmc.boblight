@@ -260,7 +260,7 @@ def settings_handleNetworkSettings():
       if g_hostport != hostport:
         print "boblight: changed hostport to " + str(hostport)
         g_hostport = hostport
-      reconnect = True
+    reconnect = True
   return reconnect
 
 #handle all settings according to the static bg light

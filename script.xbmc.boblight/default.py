@@ -47,6 +47,7 @@ def process_boblight():
   while not xbmc.abortRequested:
     if settings_checkForNewSettings():
       reconnectBoblight()
+      settings_setup()					#after reconnect reload settings
     if settings_getBobDisable():
       bob_set_priority(255)
       time.sleep(1)
@@ -143,6 +144,7 @@ def reconnectBoblight():
       text = __settings__.getLocalizedString(501)
       xbmc.executebuiltin("XBMC.Notification(%s,%s,%s,%s)" % (__scriptname__,text,10,__icon__))
       print "boblight: connected to boblightd"
+      settings_initGlobals()		#invalidate settings after reconnect
       break
   return True
 
