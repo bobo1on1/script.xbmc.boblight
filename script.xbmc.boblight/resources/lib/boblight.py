@@ -82,16 +82,25 @@ def bob_loadLibBoblight():
     try:
       if xbmc.getCondVisibility('system.platform.osx'):
         libname = xbmc.translatePath( os.path.join( __cwd__, 'resources', 'lib', __libnameosx__) )
-        cdll.LoadLibrary(libname)
-        g_libboblight = CDLL(libname)
+        if not os.path.exists(libname):
+          ret = 1
+        else:
+          cdll.LoadLibrary(libname)
+          g_libboblight = CDLL(libname)
       elif  xbmc.getCondVisibility('system.platform.ios'):
         libname = xbmc.translatePath( os.path.join( __cwd__, 'resources', 'lib', __libnameios__) )
-        cdll.LoadLibrary(libname)
-        g_libboblight = CDLL(libname)
+        if not os.path.exists(libname):
+          ret = 1
+        else:
+          cdll.LoadLibrary(libname)
+          g_libboblight = CDLL(libname)
       elif xbmc.getCondVisibility('system.platform.windows'): 
         libname = xbmc.translatePath( os.path.join( __cwd__, 'resources', 'lib', __libnamewin__) )
-        cdll.LoadLibrary(libname)
-        g_libboblight = CDLL(libname)
+        if not os.path.exists(libname):
+          ret = 1
+        else:
+          cdll.LoadLibrary(libname)
+          g_libboblight = CDLL(libname)
       else:
         cdll.LoadLibrary("libboblight.so")
         g_libboblight = CDLL("libboblight.so")
