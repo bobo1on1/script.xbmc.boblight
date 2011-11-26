@@ -280,7 +280,6 @@ def settings_handleStaticBgSettings(category):
     bob_set_static_color(byref(rgb))
     g_staticBobActive = True
   else:
-#    bob_set_priority(255)                                  #turn the lights off - will be turned on as needed in the mainloop
     g_staticBobActive = False
 
 #handles the boblight configuration of all categorys

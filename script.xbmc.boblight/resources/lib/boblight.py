@@ -48,6 +48,11 @@ __settings__ = sys.modules[ "__main__" ].__settings__
 __cwd__ = sys.modules[ "__main__" ].__cwd__
 __icon__ = sys.modules[ "__main__" ].__icon__
 
+__libbaseurl__ = sys.modules[ "__main__" ].__libbaseurl__
+__libnameosx__ = sys.modules[ "__main__" ].__libnameosx__
+__libnameios__ = sys.modules[ "__main__" ].__libnameios__
+__libnamewin__ = sys.modules[ "__main__" ].__libnamewin__
+
 global g_boblightLoaded
 global g_bobHandle
 global g_current_priority
@@ -75,12 +80,16 @@ def bob_loadLibBoblight():
     libname = "libboblight.so" #default to linux type
     # load g_libboblight.so/dylib
     try:
-      if xbmc.getCondVisibility('system.platform.ios') or xbmc.getCondVisibility('system.platform.osx'):
-        libname = xbmc.translatePath( os.path.join( __cwd__, 'resources', 'lib', 'libboblight.dylib') )
+      if xbmc.getCondVisibility('system.platform.osx'):
+        libname = xbmc.translatePath( os.path.join( __cwd__, 'resources', 'lib', __libnameosx__) )
+        cdll.LoadLibrary(libname)
+        g_libboblight = CDLL(libname)
+      elif  xbmc.getCondVisibility('system.platform.ios'):
+        libname = xbmc.translatePath( os.path.join( __cwd__, 'resources', 'lib', __libnameios__) )
         cdll.LoadLibrary(libname)
         g_libboblight = CDLL(libname)
       elif xbmc.getCondVisibility('system.platform.windows'): 
-        libname = xbmc.translatePath( os.path.join( __cwd__, 'resources', 'lib', 'libboblight.dll') )
+        libname = xbmc.translatePath( os.path.join( __cwd__, 'resources', 'lib', __libnamewin__) )
         cdll.LoadLibrary(libname)
         g_libboblight = CDLL(libname)
       else:

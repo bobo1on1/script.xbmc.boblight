@@ -26,6 +26,11 @@ __cwd__        = __settings__.getAddonInfo('path')
 __icon__       = os.path.join(__cwd__,"icon.png")
 __scriptname__ = "XBMC Boblight"
 
+__libbaseurl__ = "http://memphiz.f00-bar.net/dl/boblight/"
+__libnameosx__ = "libboblight-osx.0.dylib"
+__libnameios__ = "libboblight-ios.0.dylib"
+__libnamewin__ = "libboblight-win32.0.dll"
+
 BASE_RESOURCE_PATH = xbmc.translatePath( os.path.join( __cwd__, 'resources', 'lib' ) )
 sys.path.append (BASE_RESOURCE_PATH)
 
@@ -159,6 +164,7 @@ if loaded == 1:			#libboblight not found
   	t2 = __settings__.getLocalizedString(509)
   	if xbmcgui.Dialog().yesno(__scriptname__,t1,t2):
   	  tools_downloadLibBoblight()
+  	  loaded = bob_loadLibBoblight()
   
   if xbmc.getCondVisibility('system.platform.linux'):
     t1 = __settings__.getLocalizedString(504)
@@ -169,7 +175,8 @@ elif loaded == 2:		#no ctypes available
   t1 = __settings__.getLocalizedString(507)
   t2 = __settings__.getLocalizedString(508)
   xbmcgui.Dialog().ok(__scriptname__,t1,t2) 
-else:
+
+if loaded == 0:
   #main loop
   while not xbmc.abortRequested:
 
