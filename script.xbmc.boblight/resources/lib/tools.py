@@ -47,7 +47,7 @@ def _pbhook(numblocks, blocksize, filesize, url=None,dp=None):
     except:
         percent = 100
         dp.update(percent)
-		print "boblight: DOWNLOAD FAILED" # need to get this part working        
+        print "boblight: DOWNLOAD FAILED" # need to get this part working        
     if dp.iscanceled(): 
         print "boblight: DOWNLOAD CANCELLED" # need to get this part working
         dp.close()
