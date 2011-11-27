@@ -24,15 +24,15 @@
   <string id="207">Schwellwert</string>
   
   <string id="220">Eigene</string>
-  <string id="221">ruhig</string>
-  <string id="222">lebhaft</string>
+  <string id="221">langsam</string>
+  <string id="222">schnell</string>
   
   <!--MusicVideo-->
   <string id="300">Musikvideo</string>
   
   <string id="320">Eigene</string>
-  <string id="321">Ballade</string>
-  <string id="322">Rock</string>
+  <string id="321">langsam</string>
+  <string id="322">schnell</string>
   
   <!--Other-->
   <string id="400">Sonstige</string>

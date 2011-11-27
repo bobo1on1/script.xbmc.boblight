@@ -24,15 +24,15 @@
   <string id="207">Threshold</string>
   
   <string id="220">Custom</string>
-  <string id="221">Smooth</string>
-  <string id="222">Action</string>
+  <string id="221">Slow</string>
+  <string id="222">Fast</string>
   
   <!--MusicVideo-->
   <string id="300">Musicvideo</string>
   
   <string id="320">Custom</string>
-  <string id="321">Ballad</string>
-  <string id="322">Rock</string>
+  <string id="321">Slow</string>
+  <string id="322">Fast</string>
   
   <!--Other-->
   <string id="400">Other</string>
