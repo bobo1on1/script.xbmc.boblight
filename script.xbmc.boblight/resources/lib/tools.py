@@ -56,16 +56,19 @@ def tools_downloadLibBoblight():
   print "boblight: try to fetch libboblight"  
   url = "none"
   dest = "none"
+  destdir = xbmc.translatePath( os.path.join( __cwd__, 'resources', 'lib') )
   if xbmc.getCondVisibility('system.platform.osx'):
-    url = xbmc.translatePath( os.path.join( __libbaseurl__, __libnameosx__) )
-    dest = xbmc.translatePath( os.path.join( __cwd__, 'resources', 'lib', __libnameosx__) ) 
-    DownloaderClass(url, dest)
+    url = xbmc.translatePath( os.path.join( __libbaseurl__, 'osx', __libnameosx__) ) + ".zip"
+    dest = os.path.join( destdir, __libnameosx__) 
+    DownloaderClass(url, dest + ".zip")
   elif  xbmc.getCondVisibility('system.platform.ios'):
-    url = xbmc.translatePath( os.path.join( __libbaseurl__, __libnameios__) )
-    dest = xbmc.translatePath( os.path.join( __cwd__, 'resources', 'lib', __libnameios__) )
-    DownloaderClass(url, dest)
+    url = xbmc.translatePath( os.path.join( __libbaseurl__, 'ios', __libnameios__) ) + ".zip"
+    dest = os.path.join( destdir, __libnameios__)
+    DownloaderClass(url, dest + ".zip")
   elif xbmc.getCondVisibility('system.platform.windows'): 
-    url = xbmc.translatePath( os.path.join( __libbaseurl__, __libnamewin__) )
-    dest = xbmc.translatePath( os.path.join( __cwd__, 'resources', 'lib', __libnamewin__) )
-    DownloaderClass(url, dest)
+    url = xbmc.translatePath( os.path.join( __libbaseurl__, 'win32', __libnamewin__) ) + ".zip"
+    dest = os.path.join( destdir, __libnamewin__)
+    DownloaderClass(url, dest + ".zip")
   print "boblight: " + url + " -> " + dest
+  xbmc.executebuiltin('XBMC.Extract("%s","%s")' % (dest + ".zip", destdir), True)
+  os.remove(dest + ".zip")

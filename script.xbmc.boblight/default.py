@@ -26,7 +26,7 @@ __cwd__        = __settings__.getAddonInfo('path')
 __icon__       = os.path.join(__cwd__,"icon.png")
 __scriptname__ = "XBMC Boblight"
 
-__libbaseurl__ = "http://memphiz.f00-bar.net/dl/boblight/"
+__libbaseurl__ = "http://mirrors.xbmc.org/build-deps/addon-deps/binaries/libboblight"
 __libnameosx__ = "libboblight-osx.0.dylib"
 __libnameios__ = "libboblight-ios.0.dylib"
 __libnamewin__ = "libboblight-win32.0.dll"
