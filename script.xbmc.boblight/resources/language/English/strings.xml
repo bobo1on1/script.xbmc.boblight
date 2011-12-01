@@ -10,7 +10,7 @@
   <string id="102">Boblightd IP</string>
   <string id="103">Boblightd Port</string>
   <string id="104">Disable boblight</string>
-  <string id="105">Overwrite used category</string>
+  <string id="105">Override used category</string>
   <string id="106">Category</string>
 
   <!--Movie/MusicVideo/Other-->
