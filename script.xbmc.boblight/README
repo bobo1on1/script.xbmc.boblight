@@ -8,13 +8,13 @@ conflict you just can change the mapped key to something else).
 For this addon to be working you need a library for communicating with the boblightd - daemon. You can download it here:
 
 Windows:
-Download the library here http://mirrors.xbmc.org/build-deps/libboblight.dll
-And put it into the directory "userdata/addons/script.xbmc.boblight/resources/lib"
+Download the library here http://mirrors.xbmc.org/build-deps/addon-deps/binaries/libboblight/win32/libboblight-win32.0.dll.zip
+And extract it into the directory "userdata/addons/script.xbmc.boblight/resources/lib"
 
 
 OSX:
-http://mirrors.xbmc.org/build-deps/libboblight.dylib
-And put it into the directory "userdata/addons/script.xbmc.boblight/resources/lib"
+http://mirrors.xbmc.org/build-deps/addon-deps/binaries/libboblight/osx/libboblight-osx.0.dylib.zip
+And extract it into the directory "userdata/addons/script.xbmc.boblight/resources/lib"
 
 Linux:
 goto the projects site http://code.google.com/p/boblight/ and download the source code. Then compile and install the library by issueing the following commands (without the $'s):
