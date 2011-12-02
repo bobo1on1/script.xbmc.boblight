@@ -30,7 +30,7 @@
   </category>
   <category label="400">
 <!-- uncomment these settings when boblight works on menu and non rendered stuff too
-<!--    <setting id="other_speed" type="slider" label="202" default="100" range="0,100" />
+    <setting id="other_speed" type="slider" label="202" default="100" range="0,100" />
     <setting id="other_autospeed" type="slider" label="203" default="0" range="0,100" />
     <setting id="other_interpolation" type="bool" label="204" default="false" />
     <setting id="other_saturation" type="slider" label="205" default="1" option="float" range="0,0.1,20" />
