@@ -77,7 +77,7 @@ def process_boblight():
           bob_addpixelxy(x, y, byref(rgb))
 
       if not bob_sendrgb():
-        print "boblight: error sending values: " + bob_geterror()
+        log("boblight: error sending values: " + bob_geterror())
         return
     else:
       if not settings_isStaticBobActive():  #don't kill the lights in accident here
@@ -92,11 +92,11 @@ def initGlobals():
 
 def printLights():
   nrLights = bob_getnrlights()
-  print "boblight: Found " + str(nrLights) + " lights:"
+  log("boblight: Found " + str(nrLights) + " lights:")
 
   for i in range(0, nrLights):
     lightname = bob_getlightname(i)
-    print "boblight: " + lightname
+    log("boblight: " + lightname)
 
 #do a initial bling bling with the lights
 def showRgbBobInit():
@@ -123,9 +123,9 @@ def reconnectBoblight():
   hostport = settings_getHostPort()
   
   if hostip == None:
-    print "boblight: connecting to local boblightd"
+    log("boblight: connecting to local boblightd")
   else:
-    print "boblight: connecting to boblightd " + hostip + ":" + str(hostport)
+    log("boblight: connecting to boblightd " + hostip + ":" + str(hostport))
 
   while not xbmc.abortRequested:
     #check for new settingsk
@@ -136,7 +136,7 @@ def reconnectBoblight():
     ret = bob_connect(hostip, hostport)
 
     if not ret:
-      print "boblight: connection to boblightd failed: " + bob_geterror()
+      log("boblight: connection to boblightd failed: " + bob_geterror())
       count = 10
       while (not xbmc.abortRequested) and (count > 0):
         time.sleep(1)
@@ -148,8 +148,8 @@ def reconnectBoblight():
     else:
       text = __settings__.getLocalizedString(501)
       xbmc.executebuiltin("XBMC.Notification(%s,%s,%s,%s)" % (__scriptname__,text,10,__icon__))
-      print "boblight: connected to boblightd"
-      settings_initGlobals()		#invalidate settings after reconnect
+      log("boblight: connected to boblightd")
+      settings_initGlobals()        #invalidate settings after reconnect
       break
   return True
 
@@ -182,7 +182,7 @@ if loaded == 0:
 
     if reconnectBoblight():
       printLights()         #print found lights to debuglog
-      print "boblight: setting up with user settings"
+      log("boblight: setting up with user settings")
       showRgbBobInit()      #init light bling bling
       settings_setup()
       process_boblight()    #boblight loop
