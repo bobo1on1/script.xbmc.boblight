@@ -269,12 +269,17 @@ def settings_handleNetworkSettings():
 #category - the category we are in currently
 def settings_handleStaticBgSettings(category):
   global g_staticBobActive
-  other_static_bg     = __settings__.getSetting("other_static_bg") == "true"
-  other_static_red    = int(float(__settings__.getSetting("other_static_red")))
-  other_static_green  = int(float(__settings__.getSetting("other_static_green")))
-  other_static_blue   = int(float(__settings__.getSetting("other_static_blue")))
+  other_static_bg            = __settings__.getSetting("other_static_bg") == "true"
+  other_static_red           = int(float(__settings__.getSetting("other_static_red")))
+  other_static_green         = int(float(__settings__.getSetting("other_static_green")))
+  other_static_blue          = int(float(__settings__.getSetting("other_static_blue")))
+  other_static_onscreensaver = __settings__.getSetting("other_static_onscreensaver") == "true"
   
-  if category == "other" and other_static_bg and not g_bobdisable:#for now enable static light on other if settings want this
+  if (category == "other" and 
+          other_static_bg and 
+          not g_bobdisable and 
+          (not xbmc.getCondVisibility("System.ScreenSaverActive") or not other_static_onscreensaver)
+          ):#for now enable static light on other if settings want this
     bob_set_priority(128)                                  #allow lights to be turned on
     rgb = (c_int * 3)(other_static_red,other_static_green,other_static_blue)
     bob_set_static_color(byref(rgb))
