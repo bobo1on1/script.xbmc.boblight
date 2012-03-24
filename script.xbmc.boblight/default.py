@@ -52,7 +52,7 @@ def process_boblight():
   while not xbmc.abortRequested:
     if settings_checkForNewSettings() or not bob_ping():
       reconnectBoblight()
-      settings_setup()					#after reconnect reload settings
+      settings_setup()                    #after reconnect reload settings
     if settings_getBobDisable():
       bob_set_priority(255)
       time.sleep(1)
@@ -157,21 +157,21 @@ def reconnectBoblight():
 initGlobals()
 loaded = bob_loadLibBoblight()
 
-if loaded == 1:			#libboblight not found
+if loaded == 1:            #libboblight not found
 #ask user if we should fetch the lib for osx and windows
   if xbmc.getCondVisibility('system.platform.osx') or xbmc.getCondVisibility('system.platform.windows'):
-	t1 = __settings__.getLocalizedString(504)
-  	t2 = __settings__.getLocalizedString(509)
-  	if xbmcgui.Dialog().yesno(__scriptname__,t1,t2):
-  	  tools_downloadLibBoblight()
-  	  loaded = bob_loadLibBoblight()
+    t1 = __settings__.getLocalizedString(504)
+    t2 = __settings__.getLocalizedString(509)
+    if xbmcgui.Dialog().yesno(__scriptname__,t1,t2):
+      tools_downloadLibBoblight()
+      loaded = bob_loadLibBoblight()
   
   if xbmc.getCondVisibility('system.platform.linux'):
     t1 = __settings__.getLocalizedString(504)
     t2 = __settings__.getLocalizedString(505)
     t3 = __settings__.getLocalizedString(506)
     xbmcgui.Dialog().ok(__scriptname__,t1,t2,t3)
-elif loaded == 2:		#no ctypes available
+elif loaded == 2:        #no ctypes available
   t1 = __settings__.getLocalizedString(507)
   t2 = __settings__.getLocalizedString(508)
   xbmcgui.Dialog().ok(__scriptname__,t1,t2) 
