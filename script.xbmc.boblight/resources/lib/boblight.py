@@ -112,10 +112,10 @@ def bob_loadLibBoblight():
       g_bobHandle = c_void_p(g_libboblight.boblight_init(None))
     except:
       g_boblightLoaded = False
-      print "boblight: Error loading " + libname + " - only demo mode."
+      log("boblight: Error loading " + libname + " - only demo mode.")
       ret = 1
   else:
-    print "boblight: No ctypes available - only demo mode."
+    log("boblight: No ctypes available - only demo mode.")
     ret = 2
     g_boblightLoaded = False
   return ret
@@ -128,7 +128,7 @@ def bob_set_priority(priority):
     if priority != g_current_priority:
       g_current_priority = priority
       if not g_libboblight.boblight_setpriority(g_bobHandle, g_current_priority):
-        print "boblight: error setting priority: " + c_char_p(g_libboblight.boblight_geterror(g_bobHandle)).value
+        log("boblight: error setting priority: " + c_char_p(g_libboblight.boblight_geterror(g_bobHandle)).value)
         ret = False
   return ret
   

@@ -47,13 +47,13 @@ def _pbhook(numblocks, blocksize, filesize, url=None,dp=None):
     except:
         percent = 100
         dp.update(percent)
-        print "boblight: DOWNLOAD FAILED" # need to get this part working        
+        log("boblight: DOWNLOAD FAILED") # need to get this part working        
     if dp.iscanceled(): 
-        print "boblight: DOWNLOAD CANCELLED" # need to get this part working
+        log("boblight: DOWNLOAD CANCELLED") # need to get this part working
         dp.close()
  
 def tools_downloadLibBoblight():
-  print "boblight: try to fetch libboblight"  
+  log("boblight: try to fetch libboblight") 
   url = "none"
   dest = "none"
   destdir = xbmc.translatePath( os.path.join( __cwd__, 'resources', 'lib') )
@@ -69,6 +69,9 @@ def tools_downloadLibBoblight():
     url = "%s/%s/%s.zip" % (__libbaseurl__, 'win32', __libnamewin__)
     dest = os.path.join( destdir, __libnamewin__)
     DownloaderClass(url, dest + ".zip")
-  print "boblight: " + url + " -> " + dest
+  log("boblight: " + url + " -> " + dest)
   xbmc.executebuiltin('XBMC.Extract("%s","%s")' % (dest + ".zip", destdir), True)
   os.remove(dest + ".zip")
+
+def log(msg):
+  xbmc.log("### [%s] - %s" % (__scriptname__,msg,),level=xbmc.LOGDEBUG )
