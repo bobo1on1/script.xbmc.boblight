@@ -39,7 +39,8 @@
   <string id="401">Festes Hintergrundlicht</string>
   <string id="402">Rot</string>
   <string id="403">Gruen</string>
-  <string id="404">Blau</string>  
+  <string id="404">Blau</string>
+  <string id="405">Waehrend Bildschirmschoner Licht ausschalten</string>
 
   <!--Notifications-->                                                                                                                                                                                           
   <string id="500">Fehler beim Verbinden zu boblightd!</string>
