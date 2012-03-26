@@ -81,35 +81,31 @@ def bob_loadLibBoblight():
     # load g_libboblight.so/dylib
     try:
       if xbmc.getCondVisibility('system.platform.osx'):
-        libname = xbmc.translatePath( os.path.join( __cwd__, 'resources', 'lib', __libnameosx__) )
-        if not os.path.exists(libname):
-          ret = 1
-        else:
-          cdll.LoadLibrary(libname)
-          g_libboblight = CDLL(libname)
+        libname = xbmc.translatePath( 
+                  os.path.join( __cwd__, 'resources',
+                  'lib', __libnameosx__) )
+
       elif  xbmc.getCondVisibility('system.platform.ios'):
-        libname = xbmc.translatePath( os.path.join( __cwd__, 'resources', 'lib', __libnameios__) )
-        if not os.path.exists(libname):
-          ret = 1
-        else:
-          cdll.LoadLibrary(libname)
-          g_libboblight = CDLL(libname)
+        libname = xbmc.translatePath(
+                  os.path.join( __cwd__, 'resources',
+                  'lib', __libnameios__) )
+
       elif xbmc.getCondVisibility('system.platform.windows'): 
-        libname = xbmc.translatePath( os.path.join( __cwd__, 'resources', 'lib', __libnamewin__) )
-        if not os.path.exists(libname):
-          ret = 1
-        else:
-          cdll.LoadLibrary(libname)
-          g_libboblight = CDLL(libname)
+        libname = xbmc.translatePath(
+                  os.path.join( __cwd__, 'resources',
+                  'lib', __libnamewin__) )
+
+      if not os.path.exists(libname):
+        ret = 1
       else:
-        cdll.LoadLibrary("libboblight.so")
-        g_libboblight = CDLL("libboblight.so")
-      g_libboblight.boblight_init.restype = c_void_p
-      g_libboblight.boblight_geterror.restype = c_char_p
-      g_libboblight.boblight_getlightname.restype = c_char_p
-      g_libboblight.boblight_getoptiondescript.restype = c_char_p
-      g_boblightLoaded = True
-      g_bobHandle = c_void_p(g_libboblight.boblight_init(None))
+        cdll.LoadLibrary(libname)
+        g_libboblight = CDLL(libname)
+        g_libboblight.boblight_init.restype = c_void_p
+        g_libboblight.boblight_geterror.restype = c_char_p
+        g_libboblight.boblight_getlightname.restype = c_char_p
+        g_libboblight.boblight_getoptiondescript.restype = c_char_p
+        g_boblightLoaded = True
+        g_bobHandle = c_void_p(g_libboblight.boblight_init(None))
     except:
       g_boblightLoaded = False
       log("boblight: Error loading " + libname + " - only demo mode.")
