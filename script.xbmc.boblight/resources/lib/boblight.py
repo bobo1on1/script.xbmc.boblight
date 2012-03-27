@@ -42,6 +42,7 @@ import platform
 import xbmc
 import sys
 import os
+from tools import log
 
 __scriptname__ = sys.modules[ "__main__" ].__scriptname__
 __settings__ = sys.modules[ "__main__" ].__settings__

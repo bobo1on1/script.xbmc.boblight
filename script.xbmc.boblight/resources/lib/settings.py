@@ -26,6 +26,7 @@ __icon__       = sys.modules[ "__main__" ].__icon__
 sys.path.append (__cwd__)
 
 from boblight import *
+from tools import log
 
 #general
 global g_networkaccess
@@ -246,7 +247,7 @@ def settings_handleNetworkSettings():
   #we need to reconnect if networkaccess bool changes
   #or if network access is enabled and ip or port have changed
   if g_networkaccess != networkaccess or ((g_hostip != hostip or g_hostport != hostport) and g_networkaccess) :
-    print "boblight: changed networkaccess to " + str(networkaccess)
+    log("boblight: changed networkaccess to " + str(networkaccess))
     g_networkaccess = networkaccess
 
     if not networkaccess:
@@ -254,11 +255,11 @@ def settings_handleNetworkSettings():
       g_hostport = -1
     else:
       if g_hostip != hostip:
-        print "boblight: changed hostip to " + str(hostip)
+        log("boblight: changed hostip to " + str(hostip))
         g_hostip = hostip
     
       if g_hostport != hostport:
-        print "boblight: changed hostport to " + str(hostport)
+        log("boblight: changed hostport to " + str(hostport))
         g_hostport = hostport
     reconnect = True
   return reconnect
@@ -312,37 +313,37 @@ def settings_handleGlobalSettings(category):
   if g_saturation != saturation:  
     ret = bob_setoption("saturation    " + str(saturation))
     settingChanged = True
-    print "boblight: changed saturation to " + str(saturation) + "(ret " + str(ret) + ")"
+    log("boblight: changed saturation to " + str(saturation) + "(ret " + str(ret) + ")")
     g_saturation = saturation
   
   if g_value != value:  
     ret = bob_setoption("value         " + str(value))
     settingChanged = True
-    print "boblight: changed value to " + str(value) + "(ret " + str(ret) + ")"
+    log("boblight: changed value to " + str(value) + "(ret " + str(ret) + ")")
     g_value = value
 
   if g_speed != speed:  
     ret = bob_setoption("speed         " + str(speed))
     settingChanged = True
-    print "boblight: changed speed to " + str(speed) + "(ret " + str(ret) + ")"
+    log("boblight: changed speed to " + str(speed) + "(ret " + str(ret) + ")")
     g_speed = speed
 
   if g_autospeed != autospeed:  
     ret = bob_setoption("autospeed     " + str(autospeed))
     settingChanged = True
-    print "boblight: changed autospeed to " + str(autospeed) + "(ret " + str(ret) + ")"
+    log("boblight: changed autospeed to " + str(autospeed) + "(ret " + str(ret) + ")")
     g_autospeed = autospeed
 
   if g_interpolation != interpolation:  
     ret = bob_setoption("interpolation " + str(interpolation))
     settingChanged = True
-    print "boblight: changed interpolation to " + str(interpolation) + "(ret " + str(ret) + ")"
+    log("boblight: changed interpolation to " + str(interpolation) + "(ret " + str(ret) + ")")
     g_interpolation = interpolation
 
   if g_threshold != threshold:  
     ret = bob_setoption("threshold     " + str(threshold))
     settingChanged = True
-    print "boblight: changed threshold to " + str(threshold) + "(ret " + str(ret) + ")"
+    log("boblight: changed threshold to " + str(threshold) + "(ret " + str(ret) + ")")
     g_threshold = threshold
   return settingChanged
 
@@ -355,7 +356,7 @@ def settings_handleCategory(category):
 
   if g_category != category:
     categoryChanged = True				#don't change notify when category changes
-    print "boblight: use settings for " + category
+    log("boblight: use settings for " + category)
     g_category = category   
   return categoryChanged
 
@@ -370,9 +371,9 @@ def settings_handleDisableSetting():
     if bobdisable:
       text = __settings__.getLocalizedString(503)
       xbmc.executebuiltin("XBMC.Notification(%s,%s,%s,%s)" % (__scriptname__,text,10,__icon__))
-      print "boblight: boblight disabled"
+      log("boblight: boblight disabled")
     else:
-      print "boblight: boblight enabled"
+      log("boblight: boblight enabled")
     g_bobdisable = bobdisable 
 
 #handles all settings of boblight and applies them as needed
