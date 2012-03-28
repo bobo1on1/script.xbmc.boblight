@@ -35,24 +35,45 @@ __resource__   = xbmc.translatePath( os.path.join( __cwd__, 'resources', 'lib' )
 sys.path.append (__resource__)
 
 from boblight import *
-from settings import *
 from tools import *
+from ctypes import *
+
+import settings
 
 log( "[%s] - Version: %s Started" % (__scriptname__,__version__))
-
-global g_failedConnectionNotified
 
 capture_width = 32
 capture_height = 32
 
+settings = settings.settings()
+
+class MyPlayer( xbmc.Player ):
+    def __init__( self, *args, **kwargs ):
+        xbmc.Player.__init__( self )
+        self.function = kwargs[ "function" ]
+        self.function( 'stop' )
+          
+    def onPlayBackStopped( self ):
+        self.function( 'stop' )
+    
+    def onPlayBackEnded( self ):
+        self.function( 'stop' )     
+    
+    def onPlayBackStarted( self ):
+        self.function( 'start' )
+
 def process_boblight():
   capture = xbmc.RenderCapture()
   capture.capture(capture_width, capture_height, xbmc.CAPTURE_FLAG_CONTINUOUS)
-  while not xbmc.abortRequested:
-    if settings_checkForNewSettings() or not bob_ping():
+  p = MyPlayer(function=myPlayerChanged)
+  while not xbmc.abortRequested: 
+    
+    xbmc.sleep(50)
+    settings.run_all()
+
+    if not bob_ping():
       reconnectBoblight()
-      settings_setup()                    #after reconnect reload settings
-    if settings_getBobDisable():
+    if settings.bobdisable:
       bob_set_priority(255)
       time.sleep(1)
       continue
@@ -76,30 +97,24 @@ def process_boblight():
           bob_addpixelxy(x, y, byref(rgb))
 
       if not bob_sendrgb():
-        log("boblight: error sending values: " + bob_geterror())
+        log("boblight: error sending values: %s" % bob_geterror())
         return
     else:
-      if not settings_isStaticBobActive():  #don't kill the lights in accident here
+      if not settings.staticBobActive:  #don't kill the lights in accident here
         if not bob_set_priority(255):
           return
 
-def initGlobals():
-  global g_failedConnectionNotified
-
-  g_failedConnectionNotified = False   
-  settings_initGlobals()
-
 def printLights():
   nrLights = bob_getnrlights()
-  log("boblight: Found " + str(nrLights) + " lights:")
+  log("Found %s lights" % str(nrLights))
 
   for i in range(0, nrLights):
     lightname = bob_getlightname(i)
-    log("boblight: " + lightname)
+    log(lightname)
 
 #do a initial bling bling with the lights
 def showRgbBobInit():
-  settings_confForBobInit()
+  settings.confForBobInit()
   bob_set_priority(128)   #allow lights to be turned on
   rgb = (c_int * 3)(255,0,0)
   bob_set_static_color(byref(rgb))
@@ -116,44 +131,54 @@ def showRgbBobInit():
   bob_set_priority(255) #turn the lights off 
 
 def reconnectBoblight():
-  global g_failedConnectionNotified
   
-  hostip   = settings_getHostIp()
-  hostport = settings_getHostPort()
+  failedConnectionNotified = False
+  
+  hostip   = settings.hostip
+  hostport = settings.hostport
   
   if hostip == None:
-    log("boblight: connecting to local boblightd")
+    log("connecting to local boblightd")
   else:
-    log("boblight: connecting to boblightd " + hostip + ":" + str(hostport))
+    log("connecting to boblightd %s:%s" % (hostip, str(hostport)))
 
   while not xbmc.abortRequested:
-    #check for new settingsk
-    if settings_checkForNewSettings():    #networksettings changed?
-      g_failedConnectionNotified = False  #reset notification flag
-    hostip   = settings_getHostIp()
-    hostport = settings_getHostPort()    
     ret = bob_connect(hostip, hostport)
 
     if not ret:
-      log("boblight: connection to boblightd failed: " + bob_geterror())
+      log("connection to boblightd failed: %s" % bob_geterror())
       count = 10
       while (not xbmc.abortRequested) and (count > 0):
         time.sleep(1)
         count -= 1
-      if not g_failedConnectionNotified:
-        g_failedConnectionNotified = True
+      if not failedConnectionNotified:
+        failedConnectionNotified = True
         text = __language__(500)
         xbmc.executebuiltin("XBMC.Notification(%s,%s,%s,%s)" % (__scriptname__,text,10,__icon__))
     else:
       text = __language__(501)
       xbmc.executebuiltin("XBMC.Notification(%s,%s,%s,%s)" % (__scriptname__,text,10,__icon__))
-      log("boblight: connected to boblightd")
-      settings_initGlobals()        #invalidate settings after reconnect
+      log("connected to boblightd")
       break
   return True
 
-#MAIN - entry point
-initGlobals()
+def myPlayerChanged(state):
+  log('PlayerChanged(%s)' % state)
+  if state == 'stop':
+    ret = "other"
+  else:
+    if xbmc.getCondVisibility("VideoPlayer.Content(musicvideos)"):
+      ret = "musicvideo"
+    else:
+      ret = "movie"  
+    
+    if settings.overwrite_cat:				#fix his out when other isn't the static light anymore
+      if settings.overwrite_cat_val == 0:
+        ret = "movie"
+      else:
+        ret = "musicvideo"
+  settings.handleCategory(ret)
+
 platform = get_platform()
 libpath  = get_libpath(platform)
 loaded   = bob_loadLibBoblight(libpath)
@@ -178,17 +203,12 @@ elif loaded == 2:        #no ctypes available
   xbmcgui.Dialog().ok(__scriptname__,t1,t2) 
 
 if loaded == 0:
-  #main loop
-  while not xbmc.abortRequested:
-
-    if reconnectBoblight():
-      printLights()         #print found lights to debuglog
-      log("boblight: setting up with user settings")
-      showRgbBobInit()      #init light bling bling
-      settings_setup()
-      process_boblight()    #boblight loop
-
-    time.sleep(1)
+  if reconnectBoblight():
+    printLights()         #print found lights to debuglog
+    showRgbBobInit()      #init light bling bling
+    settings.handleDisableSetting()
+    
+    process_boblight()    #boblight loop
 
 #cleanup
 bob_destroy()
