@@ -103,7 +103,7 @@ def process_boblight():
       if not settings.staticBobActive:  #don't kill the lights in accident here
         if not bob_set_priority(255):
           return
-
+  del p
 def printLights():
   nrLights = bob_getnrlights()
   log("Found %s lights" % str(nrLights))
