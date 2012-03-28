@@ -165,7 +165,7 @@ class settings():
     if (self.category == "other" and 
             self.other_static_bg and 
             not self.bobdisable and 
-            (not xbmc.getCondVisibility("System.ScreenSaverActive") and not self.other_static_onscreensaver)
+            (not xbmc.getCondVisibility("System.ScreenSaverActive") or not self.other_static_onscreensaver)
             ):#for now enable static light on other if settings want this
       bob_set_priority(128)                                  #allow lights to be turned on
       rgb = (c_int * 3)(self.other_static_red,self.other_static_green,self.other_static_blue)
