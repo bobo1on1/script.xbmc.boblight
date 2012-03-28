@@ -1,6 +1,7 @@
+# -*- coding: utf-8 -*- 
 '''
     Boblight for XBMC
-    Copyright (C) 2011 Team XBMC
+    Copyright (C) 2012 Team XBMC
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,25 +22,23 @@ import xbmcgui
 import time
 import os
 
-__settings__   = xbmcaddon.Addon(id='script.xbmc.boblight')
-__cwd__        = __settings__.getAddonInfo('path')
-__icon__       = os.path.join(__cwd__,"icon.png")
-__scriptname__ = "XBMC Boblight"
+__addon__      = xbmcaddon.Addon()
+__cwd__        = __addon__.getAddonInfo('path')
+__scriptname__ = __addon__.getAddonInfo('name')
+__version__    = __addon__.getAddonInfo('version')
+__icon__       = __addon__.getAddonInfo('icon')
+__language__   = __addon__.getLocalizedString
 
-__libbaseurl__ = "http://mirrors.xbmc.org/build-deps/addon-deps/binaries/libboblight"
-__libnameosx__ = "libboblight-osx.0.dylib"
-__libnameios__ = "libboblight-ios.0.dylib"
-__libnamewin__ = "libboblight-win32.0.dll"
+__profile__    = xbmc.translatePath( __addon__.getAddonInfo('profile') )
+__resource__   = xbmc.translatePath( os.path.join( __cwd__, 'resources', 'lib' ) )
 
-BASE_RESOURCE_PATH = xbmc.translatePath( os.path.join( __cwd__, 'resources', 'lib' ) )
-sys.path.append (BASE_RESOURCE_PATH)
+sys.path.append (__resource__)
 
 from boblight import *
 from settings import *
 from tools import *
 
-#if __settings__.getSetting('enabled') != 'true':
-#  exit(0)
+log( "[%s] - Version: %s Started" % (__scriptname__,__version__))
 
 global g_failedConnectionNotified
 
@@ -143,10 +142,10 @@ def reconnectBoblight():
         count -= 1
       if not g_failedConnectionNotified:
         g_failedConnectionNotified = True
-        text = __settings__.getLocalizedString(500)
+        text = __language__(500)
         xbmc.executebuiltin("XBMC.Notification(%s,%s,%s,%s)" % (__scriptname__,text,10,__icon__))
     else:
-      text = __settings__.getLocalizedString(501)
+      text = __language__(501)
       xbmc.executebuiltin("XBMC.Notification(%s,%s,%s,%s)" % (__scriptname__,text,10,__icon__))
       log("boblight: connected to boblightd")
       settings_initGlobals()        #invalidate settings after reconnect
@@ -155,25 +154,27 @@ def reconnectBoblight():
 
 #MAIN - entry point
 initGlobals()
-loaded = bob_loadLibBoblight()
+platform = get_platform()
+libpath  = get_libpath(platform)
+loaded   = bob_loadLibBoblight(libpath)
 
 if loaded == 1:            #libboblight not found
 #ask user if we should fetch the lib for osx and windows
-  if xbmc.getCondVisibility('system.platform.osx') or xbmc.getCondVisibility('system.platform.windows'):
-    t1 = __settings__.getLocalizedString(504)
-    t2 = __settings__.getLocalizedString(509)
+  if platform == 'osx' or platform == 'win32':
+    t1 = __language__(504)
+    t2 = __language__(509)
     if xbmcgui.Dialog().yesno(__scriptname__,t1,t2):
-      tools_downloadLibBoblight()
-      loaded = bob_loadLibBoblight()
+      tools_downloadLibBoblight(platform)
+      loaded = bob_loadLibBoblight(libpath)
   
-  if xbmc.getCondVisibility('system.platform.linux'):
-    t1 = __settings__.getLocalizedString(504)
-    t2 = __settings__.getLocalizedString(505)
-    t3 = __settings__.getLocalizedString(506)
+  if platform == 'linux':
+    t1 = __language__(504)
+    t2 = __language__(505)
+    t3 = __language__(506)
     xbmcgui.Dialog().ok(__scriptname__,t1,t2,t3)
 elif loaded == 2:        #no ctypes available
-  t1 = __settings__.getLocalizedString(507)
-  t2 = __settings__.getLocalizedString(508)
+  t1 = __language__(507)
+  t2 = __language__(508)
   xbmcgui.Dialog().ok(__scriptname__,t1,t2) 
 
 if loaded == 0:

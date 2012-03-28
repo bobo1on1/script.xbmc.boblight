@@ -1,6 +1,7 @@
+# -*- coding: utf-8 -*- 
 '''
     Boblight for XBMC
-    Copyright (C) 2011 Team XBMC
+    Copyright (C) 2012 Team XBMC
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,21 +39,10 @@ c_int(g_libboblight.boblight_sendrgb(boblight, int sync, int* outputused))
 c_int(g_libboblight.boblight_ping(boblight, int* outputused))
 
 """
-import platform
-import xbmc
 import sys
 import os
+
 from tools import log
-
-__scriptname__ = sys.modules[ "__main__" ].__scriptname__
-__settings__ = sys.modules[ "__main__" ].__settings__
-__cwd__ = sys.modules[ "__main__" ].__cwd__
-__icon__ = sys.modules[ "__main__" ].__icon__
-
-__libbaseurl__ = sys.modules[ "__main__" ].__libbaseurl__
-__libnameosx__ = sys.modules[ "__main__" ].__libnameosx__
-__libnameios__ = sys.modules[ "__main__" ].__libnameios__
-__libnamewin__ = sys.modules[ "__main__" ].__libnamewin__
 
 global g_boblightLoaded
 global g_bobHandle
@@ -66,36 +56,20 @@ try:
 except:
   HAVE_CTYPES = False
 
-def bob_loadLibBoblight():
+def bob_loadLibBoblight(libname):
   global g_boblightLoaded
   global g_current_priority
   global g_libboblight  
   global g_bobHandle
   global g_connected
-
+  
+  g_boblightLoaded = False
   g_connected = False
   g_current_priority = -1
   ret = 0
 
   if HAVE_CTYPES:
-    libname = "libboblight.so" #default to linux type
-    # load g_libboblight.so/dylib
     try:
-      if xbmc.getCondVisibility('system.platform.osx'):
-        libname = xbmc.translatePath( 
-                  os.path.join( __cwd__, 'resources',
-                  'lib', __libnameosx__) )
-
-      elif  xbmc.getCondVisibility('system.platform.ios'):
-        libname = xbmc.translatePath(
-                  os.path.join( __cwd__, 'resources',
-                  'lib', __libnameios__) )
-
-      elif xbmc.getCondVisibility('system.platform.windows'): 
-        libname = xbmc.translatePath(
-                  os.path.join( __cwd__, 'resources',
-                  'lib', __libnamewin__) )
-
       if not os.path.exists(libname):
         ret = 1
       else:
@@ -107,14 +81,13 @@ def bob_loadLibBoblight():
         g_libboblight.boblight_getoptiondescript.restype = c_char_p
         g_boblightLoaded = True
         g_bobHandle = c_void_p(g_libboblight.boblight_init(None))
+        
     except:
-      g_boblightLoaded = False
       log("boblight: Error loading " + libname + " - only demo mode.")
       ret = 1
   else:
     log("boblight: No ctypes available - only demo mode.")
     ret = 2
-    g_boblightLoaded = False
   return ret
 
 def bob_set_priority(priority):

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- 
 '''
     Boblight for XBMC
     Copyright (C) 2011 Team XBMC
@@ -19,10 +20,13 @@
 import sys
 import time
 import xbmc
+
 __scriptname__ = sys.modules[ "__main__" ].__scriptname__
-__settings__   = sys.modules[ "__main__" ].__settings__
+__addon__      = sys.modules[ "__main__" ].__addon__
 __cwd__        = sys.modules[ "__main__" ].__cwd__
 __icon__       = sys.modules[ "__main__" ].__icon__
+__language__   = sys.modules[ "__main__" ].__language__
+
 sys.path.append (__cwd__)
 
 from boblight import *
@@ -76,9 +80,9 @@ def settings_initGlobals():
   g_autospeed      = -1.0
   g_interpolation  = -1
   g_threshold      = -1.0
-  g_networkaccess  = __settings__.getSetting("networkaccess") == "true"
-  g_hostip         = __settings__.getSetting("hostip")
-  g_hostport       = int(__settings__.getSetting("hostport"))  
+  g_networkaccess  = __addon__.getSetting("networkaccess") == "true"
+  g_hostip         = __addon__.getSetting("hostip")
+  g_hostport       = int(__addon__.getSetting("hostport"))  
   g_timer          = time.time()
   g_category       = "movie"
   g_bobdisable     = -1
@@ -154,7 +158,7 @@ def settings_checkForNewSettings():
 #handle boblight configuration from the "Movie" category
 #returns the new settings
 def settings_setupForMovie(): 
-  preset = int(__settings__.getSetting("movie_preset"))
+  preset = int(__addon__.getSetting("movie_preset"))
 
   if preset == 1:       #preset smooth
     saturation    = 3.0
@@ -171,18 +175,18 @@ def settings_setupForMovie():
     interpolation = 0
     threshold     = 0.0
   elif preset == 0:     #custom
-    saturation      =  float(__settings__.getSetting("movie_saturation"))
-    value           =  float(__settings__.getSetting("movie_value"))
-    speed           =  float(__settings__.getSetting("movie_speed"))
-    autospeed       =  float(__settings__.getSetting("movie_autospeed"))
-    interpolation   =  __settings__.getSetting("movie_interpolation") == "true"
-    threshold       =  float(__settings__.getSetting("movie_threshold"))
+    saturation      =  float(__addon__.getSetting("movie_saturation"))
+    value           =  float(__addon__.getSetting("movie_value"))
+    speed           =  float(__addon__.getSetting("movie_speed"))
+    autospeed       =  float(__addon__.getSetting("movie_autospeed"))
+    interpolation   =  __addon__.getSetting("movie_interpolation") == "true"
+    threshold       =  float(__addon__.getSetting("movie_threshold"))
   return (saturation,value,speed,autospeed,interpolation,threshold)
 
 #handle boblight configuration from the "MusicVideo" category
 #returns the new settings
 def settings_setupForMusicVideo():
-  preset = int(__settings__.getSetting("musicvideo_preset"))
+  preset = int(__addon__.getSetting("musicvideo_preset"))
 
   if preset == 1:       #preset Ballad
     saturation    = 3.0
@@ -199,24 +203,24 @@ def settings_setupForMusicVideo():
     interpolation = 0
     threshold     = 0.0
   elif preset == 0:     #custom
-    saturation      =  float(__settings__.getSetting("musicvideo_saturation"))
-    value           =  float(__settings__.getSetting("musicvideo_value"))
-    speed           =  float(__settings__.getSetting("musicvideo_speed"))
-    autospeed       =  float(__settings__.getSetting("movie_autospeed"))
-    interpolation   =  __settings__.getSetting("musicvideo_interpolation") == "true"
-    threshold       =  float(__settings__.getSetting("musicvideo_threshold"))
+    saturation      =  float(__addon__.getSetting("musicvideo_saturation"))
+    value           =  float(__addon__.getSetting("musicvideo_value"))
+    speed           =  float(__addon__.getSetting("musicvideo_speed"))
+    autospeed       =  float(__addon__.getSetting("movie_autospeed"))
+    interpolation   =  __addon__.getSetting("musicvideo_interpolation") == "true"
+    threshold       =  float(__addon__.getSetting("musicvideo_threshold"))
   return (saturation,value,speed,autospeed,interpolation,threshold)
 
 #handle boblight configuration from the "other" category
 #returns the new settings
 def settings_setupForOther():
 # FIXME don't use them for now - reactivate when boblight works on non rendered scenes (e.x. menu)
-#  saturation      =  float(__settings__.getSetting("other_saturation"))
-#  value           =  float(__settings__.getSetting("other_value"))
-#  speed           =  float(__settings__.getSetting("other_speed"))
-#  autospeed       =  float(__settings__.getSetting("other_autospeed"))
-#  interpolation   =  __settings__.getSetting("other_interpolation") == "true"
-#  threshold       =  float(__settings__.getSetting("other_threshold"))
+#  saturation      =  float(__addon__.getSetting("other_saturation"))
+#  value           =  float(__addon__.getSetting("other_value"))
+#  speed           =  float(__addon__.getSetting("other_speed"))
+#  autospeed       =  float(__addon__.getSetting("other_autospeed"))
+#  interpolation   =  __addon__.getSetting("other_interpolation") == "true"
+#  threshold       =  float(__addon__.getSetting("other_threshold"))
   return settings_setupForStatic()
 
 #handle boblight configuration for static lights
@@ -239,9 +243,9 @@ def settings_handleNetworkSettings():
   global g_hostport
   reconnect = False
 
-  networkaccess = __settings__.getSetting("networkaccess") == "true"
-  hostip        = __settings__.getSetting("hostip")
-  hostport      = int(__settings__.getSetting("hostport"))
+  networkaccess = __addon__.getSetting("networkaccess") == "true"
+  hostip        = __addon__.getSetting("hostip")
+  hostport      = int(__addon__.getSetting("hostport"))
 
   #server settings
   #we need to reconnect if networkaccess bool changes
@@ -270,11 +274,11 @@ def settings_handleNetworkSettings():
 #category - the category we are in currently
 def settings_handleStaticBgSettings(category):
   global g_staticBobActive
-  other_static_bg            = __settings__.getSetting("other_static_bg") == "true"
-  other_static_red           = int(float(__settings__.getSetting("other_static_red")))
-  other_static_green         = int(float(__settings__.getSetting("other_static_green")))
-  other_static_blue          = int(float(__settings__.getSetting("other_static_blue")))
-  other_static_onscreensaver = __settings__.getSetting("other_static_onscreensaver") == "true"
+  other_static_bg            = __addon__.getSetting("other_static_bg") == "true"
+  other_static_red           = int(float(__addon__.getSetting("other_static_red")))
+  other_static_green         = int(float(__addon__.getSetting("other_static_green")))
+  other_static_blue          = int(float(__addon__.getSetting("other_static_blue")))
+  other_static_onscreensaver = __addon__.getSetting("other_static_onscreensaver") == "true"
   
   if (category == "other" and 
           other_static_bg and 
@@ -365,11 +369,11 @@ def settings_handleCategory(category):
 #toast dialog on disable
 def settings_handleDisableSetting():
   global g_bobdisable
-  bobdisable  = __settings__.getSetting("bobdisable") == "true"  
+  bobdisable  = __addon__.getSetting("bobdisable") == "true"  
     
   if g_bobdisable != bobdisable:
     if bobdisable:
-      text = __settings__.getLocalizedString(503)
+      text = __language__(503)
       xbmc.executebuiltin("XBMC.Notification(%s,%s,%s,%s)" % (__scriptname__,text,10,__icon__))
       log("boblight: boblight disabled")
     else:
@@ -385,8 +389,8 @@ def settings_setup():
   settingChanged = False
   categoryChanged = False
 
-  g_overwrite_cat = __settings__.getSetting("overwrite_cat") == "true"
-  g_overwrite_cat_val = int(__settings__.getSetting("overwrite_cat_val"))
+  g_overwrite_cat = __addon__.getSetting("overwrite_cat") == "true"
+  g_overwrite_cat_val = int(__addon__.getSetting("overwrite_cat_val"))
 
   category = settings_getSettingCategory()
   categoryChanged = settings_handleCategory(category)
@@ -397,7 +401,7 @@ def settings_setup():
 
   #notify user via toast dialog when a setting was changed (beside category changes)
   if settingChanged and not categoryChanged:
-    text = __settings__.getLocalizedString(502)
+    text = __language__(502)
     xbmc.executebuiltin("XBMC.Notification(%s,%s,%s,%s)" % (__scriptname__,text,10,__icon__))
 
   return reconnect
