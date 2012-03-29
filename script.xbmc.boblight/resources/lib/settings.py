@@ -29,6 +29,8 @@ __language__   = sys.modules[ "__main__" ].__language__
 from boblight import *
 from tools import log
 
+bob = Boblight()
+
 class settings():
   def __init__( self, *args, **kwargs ):
     log('__init__')
@@ -63,6 +65,7 @@ class settings():
     self.movie_interpolation        =  __addon__.getSetting("movie_interpolation") == "true"
     self.movie_threshold            =  float(__addon__.getSetting("movie_threshold"))
     self.movie_preset               = int(__addon__.getSetting("movie_preset"))
+    
     # Music Video settings
     self.music_saturation           =  float(__addon__.getSetting("musicvideo_saturation"))
     self.music_value                =  float(__addon__.getSetting("musicvideo_value"))
@@ -83,12 +86,12 @@ class settings():
   def confForBobInit(self):
     log('confForBobInit')
     saturation,value,speed,autospeed,interpolation,threshold = self.setupForStatic()
-    bob_setoption("saturation    " + str(saturation))
-    bob_setoption("value         " + str(value))
-    bob_setoption("speed         " + str(speed))
-    bob_setoption("autospeed     " + str(autospeed))
-    bob_setoption("interpolation " + str(interpolation))
-    bob_setoption("threshold     " + str(threshold))
+    bob.bob_setoption("saturation    " + str(saturation))
+    bob.bob_setoption("value         " + str(value))
+    bob.bob_setoption("speed         " + str(speed))
+    bob.bob_setoption("autospeed     " + str(autospeed))
+    bob.bob_setoption("interpolation " + str(interpolation))
+    bob.bob_setoption("threshold     " + str(threshold))
 
   #handle boblight configuration from the "Movie" category
   #returns the new settings
@@ -182,9 +185,9 @@ class settings():
               self.other_static_bg and  
               (not (screensaver and self.other_static_onscreensaver))
               ):#for now enable static light on other if settings want this
-        bob_set_priority(128)                                  #allow lights to be turned on
+        bob.bob_set_priority(128)                                  #allow lights to be turned on
         rgb = (c_int * 3)(self.other_static_red,self.other_static_green,self.other_static_blue)
-        bob_set_static_color(byref(rgb))
+        bob.bob_set_static_color(byref(rgb))
         self.staticBobActive = True
       else:
         self.staticBobActive = False
