@@ -33,9 +33,7 @@ __resource__   = xbmc.translatePath( os.path.join( __cwd__, 'resources', 'lib' )
 
 sys.path.append (__resource__)
 
-import settings
-
-from boblight import *
+from settings import *
 from tools import *
 
 log( "[%s] - Version: %s Started" % (__scriptname__,__version__))
@@ -43,7 +41,7 @@ log( "[%s] - Version: %s Started" % (__scriptname__,__version__))
 capture_width = 32
 capture_height = 32
 
-settings = settings.settings()
+settings = settings()
 
 class MyPlayer( xbmc.Player ):
     def __init__( self, *args, **kwargs ):
