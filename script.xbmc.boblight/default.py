@@ -19,7 +19,6 @@
 import xbmc
 import xbmcaddon
 import xbmcgui
-import time
 import os
 
 __addon__      = xbmcaddon.Addon()
@@ -34,11 +33,10 @@ __resource__   = xbmc.translatePath( os.path.join( __cwd__, 'resources', 'lib' )
 
 sys.path.append (__resource__)
 
+import settings
+
 from boblight import *
 from tools import *
-from ctypes import *
-
-import settings
 
 log( "[%s] - Version: %s Started" % (__scriptname__,__version__))
 
@@ -65,18 +63,14 @@ class MyPlayer( xbmc.Player ):
 def process_boblight():
   capture = xbmc.RenderCapture()
   capture.capture(capture_width, capture_height, xbmc.CAPTURE_FLAG_CONTINUOUS)
-  p = MyPlayer(function=myPlayerChanged)
-  while not xbmc.abortRequested: 
+  player_monitor = MyPlayer(function=myPlayerChanged)
+  while not xbmc.abortRequested or settings.bobdisable: 
     
     xbmc.sleep(50)
-    settings.run_all()
+    settings.handleStaticBgSettings()
 
     if not bob_ping():
       reconnectBoblight()
-    if settings.bobdisable:
-      bob_set_priority(255)
-      time.sleep(1)
-      continue
       
     capture.waitForCaptureStateChangeEvent(1000)
     if capture.getCaptureState() == xbmc.CAPTURE_STATE_DONE:
@@ -103,7 +97,11 @@ def process_boblight():
       if not settings.staticBobActive:  #don't kill the lights in accident here
         if not bob_set_priority(255):
           return
-  del p
+          
+  bob_set_priority(255) # we are shutting down, kill the LEDs
+  xbmc.sleep(50)
+  del player_monitor
+  
 def printLights():
   nrLights = bob_getnrlights()
   log("Found %s lights" % str(nrLights))
@@ -118,22 +116,21 @@ def showRgbBobInit():
   bob_set_priority(128)   #allow lights to be turned on
   rgb = (c_int * 3)(255,0,0)
   bob_set_static_color(byref(rgb))
-  time.sleep(0.3)
+  xbmc.sleep(1500)
   rgb = (c_int * 3)(0,255,0)
   bob_set_static_color(byref(rgb))
-  time.sleep(0.3)
+  xbmc.sleep(1500)
   rgb = (c_int * 3)(0,0,255)
   bob_set_static_color(byref(rgb))
-  time.sleep(0.3)
+  xbmc.sleep(1500)
   rgb = (c_int * 3)(0,0,0)
   bob_set_static_color(byref(rgb))
-  time.sleep(3)
+  xbmc.sleep(1500)
   bob_set_priority(255) #turn the lights off 
 
 def reconnectBoblight():
   
-  failedConnectionNotified = False
-  
+  failedConnectionNotified = False 
   hostip   = settings.hostip
   hostport = settings.hostport
   
@@ -149,7 +146,7 @@ def reconnectBoblight():
       log("connection to boblightd failed: %s" % bob_geterror())
       count = 10
       while (not xbmc.abortRequested) and (count > 0):
-        time.sleep(1)
+        xbmc.sleep(1000)
         count -= 1
       if not failedConnectionNotified:
         failedConnectionNotified = True
@@ -177,7 +174,7 @@ def myPlayerChanged(state):
         ret = "movie"
       else:
         ret = "musicvideo"
-  settings.handleCategory(ret)
+  settings.handleCategory(ret, True)
 
 platform = get_platform()
 libpath  = get_libpath(platform)
@@ -206,9 +203,9 @@ if loaded == 0:
   if reconnectBoblight():
     printLights()         #print found lights to debuglog
     showRgbBobInit()      #init light bling bling
-    settings.handleDisableSetting()
-    
     process_boblight()    #boblight loop
 
 #cleanup
 bob_destroy()
+
+

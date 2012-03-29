@@ -26,10 +26,8 @@ __cwd__        = sys.modules[ "__main__" ].__cwd__
 __icon__       = sys.modules[ "__main__" ].__icon__
 __language__   = sys.modules[ "__main__" ].__language__
 
-
 from boblight import *
 from tools import log
-from ctypes import *
 
 class settings():
   def __init__( self, *args, **kwargs ):
@@ -44,7 +42,6 @@ class settings():
     self.autospeed                  = -1.0
     self.interpolation              = -1
     self.threshold                  = -1.0
-    self.bobdisable                 = -1
     self.staticBobActive            = False
     self.category                   = "other"
     self.networkaccess              = __addon__.getSetting("networkaccess") == "true"
@@ -55,6 +52,25 @@ class settings():
     self.other_static_green         = int(float(__addon__.getSetting("other_static_green")))
     self.other_static_blue          = int(float(__addon__.getSetting("other_static_blue")))
     self.other_static_onscreensaver = __addon__.getSetting("other_static_onscreensaver") == "true"
+    self.screensaver                = xbmc.getCondVisibility("System.ScreenSaverActive")
+    self.bobdisable                 = __addon__.getSetting("bobdisable") == "true"
+    
+    # Movie settings
+    self.movie_saturation           =  float(__addon__.getSetting("movie_saturation"))
+    self.movie_value                =  float(__addon__.getSetting("movie_value"))
+    self.movie_speed                =  float(__addon__.getSetting("movie_speed"))
+    self.movie_autospeed            =  float(__addon__.getSetting("movie_autospeed"))
+    self.movie_interpolation        =  __addon__.getSetting("movie_interpolation") == "true"
+    self.movie_threshold            =  float(__addon__.getSetting("movie_threshold"))
+    self.movie_preset               = int(__addon__.getSetting("movie_preset"))
+    # Music Video settings
+    self.music_saturation           =  float(__addon__.getSetting("musicvideo_saturation"))
+    self.music_value                =  float(__addon__.getSetting("musicvideo_value"))
+    self.music_speed                =  float(__addon__.getSetting("musicvideo_speed"))
+    self.music_autospeed            =  float(__addon__.getSetting("movie_autospeed"))
+    self.music_interpolation        =  __addon__.getSetting("musicvideo_interpolation") == "true"
+    self.music_threshold            =  float(__addon__.getSetting("musicvideo_threshold"))
+    self.music_preset               = int(__addon__.getSetting("musicvideo_preset"))
 
     if not self.networkaccess:
       self.hostip   = None
@@ -77,59 +93,57 @@ class settings():
   #handle boblight configuration from the "Movie" category
   #returns the new settings
   def setupForMovie(self):
-    log('setupForMovie') 
-    preset = int(__addon__.getSetting("movie_preset"))
+    log('setupForMovie')
   
-    if preset == 1:       #preset smooth
+    if self.movie_preset == 1:       #preset smooth
       saturation    = 3.0
       value         = 10.0
       speed         = 20.0
       autospeed     = 0.0 
       interpolation = 0
       threshold     = 0.0
-    elif preset == 2:     #preset action
+    elif self.movie_preset == 2:     #preset action
       saturation    = 3.0
       value         = 10.0
       speed         = 80.0
       autospeed     = 0.0  
       interpolation = 0
       threshold     = 0.0
-    elif preset == 0:     #custom
-      saturation      =  float(__addon__.getSetting("movie_saturation"))
-      value           =  float(__addon__.getSetting("movie_value"))
-      speed           =  float(__addon__.getSetting("movie_speed"))
-      autospeed       =  float(__addon__.getSetting("movie_autospeed"))
-      interpolation   =  __addon__.getSetting("movie_interpolation") == "true"
-      threshold       =  float(__addon__.getSetting("movie_threshold"))
+    elif self.movie_preset == 0:     #custom
+      saturation      =  self.movie_saturation
+      value           =  self.movie_value
+      speed           =  self.movie_speed
+      autospeed       =  self.movie_autospeed
+      interpolation   =  self.movie_interpolation
+      threshold       =  self.movie_threshold
     return (saturation,value,speed,autospeed,interpolation,threshold)
   
   #handle boblight configuration from the "MusicVideo" category
   #returns the new settings
   def setupForMusicVideo(self):
     log('setupForMusicVideo')
-    preset = int(__addon__.getSetting("musicvideo_preset"))
   
-    if preset == 1:       #preset Ballad
+    if self.music_preset == 1:       #preset Ballad
       saturation    = 3.0
       value         = 10.0
       speed         = 20.0  
       autospeed     = 0.0
       interpolation = 1
       threshold     = 0.0
-    elif preset == 2:     #preset Rock
+    elif self.music_preset == 2:     #preset Rock
       saturation    = 3.0
       value         = 10.0
       speed         = 80.0
       autospeed     = 0.0  
       interpolation = 0
       threshold     = 0.0
-    elif preset == 0:     #custom
-      saturation      =  float(__addon__.getSetting("musicvideo_saturation"))
-      value           =  float(__addon__.getSetting("musicvideo_value"))
-      speed           =  float(__addon__.getSetting("musicvideo_speed"))
-      autospeed       =  float(__addon__.getSetting("movie_autospeed"))
-      interpolation   =  __addon__.getSetting("musicvideo_interpolation") == "true"
-      threshold       =  float(__addon__.getSetting("musicvideo_threshold"))
+    elif self.music_preset == 0:     #custom
+      saturation      =  self.movie_saturation
+      value           =  self.movie_value
+      speed           =  self.movie_speed
+      autospeed       =  self.movie_autospeed
+      interpolation   =  self.movie_interpolation
+      threshold       =  self.movie_threshold    
     return (saturation,value,speed,autospeed,interpolation,threshold)
   
   #handle boblight configuration from the "other" category
@@ -161,18 +175,20 @@ class settings():
   #this is used until category "other" can do real boblight
   #when no video is rendered
   #category - the category we are in currently
-  def handleStaticBgSettings(self):
-    if (self.category == "other" and 
-            self.other_static_bg and 
-            not self.bobdisable and 
-            (not xbmc.getCondVisibility("System.ScreenSaverActive") or not self.other_static_onscreensaver)
-            ):#for now enable static light on other if settings want this
-      bob_set_priority(128)                                  #allow lights to be turned on
-      rgb = (c_int * 3)(self.other_static_red,self.other_static_green,self.other_static_blue)
-      bob_set_static_color(byref(rgb))
-      self.staticBobActive = True
-    else:
-      self.staticBobActive = False
+  def handleStaticBgSettings(self, force=False):
+    screensaver = xbmc.getCondVisibility("System.ScreenSaverActive")
+    if (self.screensaver == screensaver) or force:
+      if (self.category == "other" and 
+              self.other_static_bg and  
+              (not (screensaver and self.other_static_onscreensaver))
+              ):#for now enable static light on other if settings want this
+        bob_set_priority(128)                                  #allow lights to be turned on
+        rgb = (c_int * 3)(self.other_static_red,self.other_static_green,self.other_static_blue)
+        bob_set_static_color(byref(rgb))
+        self.staticBobActive = True
+      else:
+        self.staticBobActive = False
+      self.screensaver = not screensaver  
 
   #handles the boblight configuration of all categorys
   #and applies changed settings to boblight
@@ -191,26 +207,11 @@ class settings():
   #handle change of category we are in
   #"movie","musicvideo" or "other"
   #returns if category has changed  
-  def handleCategory(self, category):
+  def handleCategory(self, category, force = False):
     log('handleCategory(%s)' % category)
     self.category = category
-    log("boblight: use settings for %s" % category)
-    self.handleStaticBgSettings()
+    self.handleStaticBgSettings(force)
     if not self.staticBobActive:
       self.handleGlobalSettings()
-
-  
-  #handle bob disable setting
-  #sets the global g_bobdisable and prints
-  #toast dialog on disable
-  def handleDisableSetting(self):
-    self.bobdisable = __addon__.getSetting("bobdisable") == "true"
-
-  def run_all(self):
-    self.handleStaticBgSettings()
-
-
-                
-
 
 
