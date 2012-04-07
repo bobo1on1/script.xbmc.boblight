@@ -26,6 +26,7 @@ __cwd__        = __addon__.getAddonInfo('path')
 __scriptname__ = __addon__.getAddonInfo('name')
 __version__    = __addon__.getAddonInfo('version')
 __icon__       = __addon__.getAddonInfo('icon')
+__ID__         = __addon__.getAddonInfo('id')
 __language__   = __addon__.getLocalizedString
 
 __profile__    = xbmc.translatePath( __addon__.getAddonInfo('profile') )
@@ -46,6 +47,7 @@ settings = settings()
 class MyPlayer( xbmc.Player ):
     def __init__( self, *args, **kwargs ):
         xbmc.Player.__init__( self )
+        log('MyPlayer - init')
         self.function = kwargs[ "function" ]
         self.function( 'stop' )
           
@@ -58,76 +60,77 @@ class MyPlayer( xbmc.Player ):
     def onPlayBackStarted( self ):
         self.function( 'start' )
 
+class MyMonitor( xbmc.Monitor ):
+    def __init__( self, *args, **kwargs ):
+        xbmc.Monitor.__init__( self )
+        log('MyMonitor - init')
+          
+    def onSettingsChanged( self ):
+        settings.start()
+        settings.handleStaticBgSettings()
+        
+    def onScreensaverDeactivated( self ):
+        settings.screensaver = False
+        settings.handleStaticBgSettings()
+        
+    def onScreensaverActivated( self ):    
+        settings.screensaver = True
+        settings.handleStaticBgSettings()
+
+
 def process_boblight():
   capture = xbmc.RenderCapture()
   capture.capture(capture_width, capture_height, xbmc.CAPTURE_FLAG_CONTINUOUS)
   player_monitor = MyPlayer(function=myPlayerChanged)
-  while not xbmc.abortRequested or settings.bobdisable: 
-    
-    xbmc.sleep(50)
-    settings.handleStaticBgSettings()
+  xbmc_monitor = MyMonitor()
+  
+  bobdisable = False
+  while not xbmc.abortRequested:
+    xbmc.sleep(100)
+    if not settings.bobdisable:
 
-    if not bob.bob_ping():
-      reconnectBoblight()
-      
-    capture.waitForCaptureStateChangeEvent(1000)
-    if capture.getCaptureState() == xbmc.CAPTURE_STATE_DONE:
-      if not bob.bob_set_priority(128):
-        return
-
-      width = capture.getWidth();
-      height = capture.getHeight();
-      pixels = capture.getImage();
-      bob.bob_setscanrange(width, height)
-      rgb = (c_int * 3)()
-      for y in range(height):
-        row = width * y * 4
-        for x in range(width):
-          rgb[0] = pixels[row + x * 4 + 2]
-          rgb[1] = pixels[row + x * 4 + 1]
-          rgb[2] = pixels[row + x * 4]
-          bob.bob_addpixelxy(x, y, byref(rgb))
-
-      if not bob.bob_sendrgb():
-        log("boblight: error sending values: %s" % bob.bob_geterror())
-        return
-    else:
-      if not settings.staticBobActive:  #don't kill the lights in accident here
-        if not bob.bob_set_priority(255):
+      bobdisable = True
+      if not bob.bob_ping():
+        reconnectBoblight()
+        
+      capture.waitForCaptureStateChangeEvent(1000)
+      if capture.getCaptureState() == xbmc.CAPTURE_STATE_DONE:
+        if not bob.bob_set_priority(128):
           return
-          
+  
+        width = capture.getWidth();
+        height = capture.getHeight();
+        pixels = capture.getImage();
+        bob.bob_setscanrange(width, height)
+        rgb = (c_int * 3)()
+        for y in range(height):
+          row = width * y * 4
+          for x in range(width):
+            rgb[0] = pixels[row + x * 4 + 2]
+            rgb[1] = pixels[row + x * 4 + 1]
+            rgb[2] = pixels[row + x * 4]
+            bob.bob_addpixelxy(x, y, byref(rgb))
+  
+        if not bob.bob_sendrgb():
+          log("boblight: error sending values: %s" % bob.bob_geterror())
+          return
+      else:
+        if not settings.staticBobActive:  #don't kill the lights in accident here
+          if not bob.bob_set_priority(255):
+            return
+            
+    elif bobdisable:
+      log('boblight disabled in Addon Settings')
+      bobdisable = False
+      bob.bob_set_priority(255)
+                       
   bob.bob_set_priority(255) # we are shutting down, kill the LEDs
   xbmc.sleep(50)
   del player_monitor
-  
-def printLights():
-  nrLights = bob.bob_getnrlights()
-  log("Found %s lights" % str(nrLights))
+  xbmc.sleep(50)
+  del xbmc_monitor
 
-  for i in range(0, nrLights):
-    lightname = bob.bob_getlightname(i)
-    log(lightname)
-
-#do a initial bling bling with the lights
-def showRgbBobInit():
-  settings.confForBobInit()
-  bob.bob_set_priority(128)   #allow lights to be turned on
-  rgb = (c_int * 3)(255,0,0)
-  bob.bob_set_static_color(byref(rgb))
-  xbmc.sleep(1500)
-  rgb = (c_int * 3)(0,255,0)
-  bob.bob_set_static_color(byref(rgb))
-  xbmc.sleep(1500)
-  rgb = (c_int * 3)(0,0,255)
-  bob.bob_set_static_color(byref(rgb))
-  xbmc.sleep(1500)
-  rgb = (c_int * 3)(0,0,0)
-  bob.bob_set_static_color(byref(rgb))
-  xbmc.sleep(1500)
-  bob.bob_set_priority(255) #turn the lights off 
-
-def reconnectBoblight():
-  
+def reconnectBoblight():  
   failedConnectionNotified = False 
   hostip   = settings.hostip
   hostport = settings.hostport
@@ -159,6 +162,7 @@ def reconnectBoblight():
 
 def myPlayerChanged(state):
   log('PlayerChanged(%s)' % state)
+  xbmc.sleep(200)
   if state == 'stop':
     ret = "other"
   else:
@@ -166,44 +170,45 @@ def myPlayerChanged(state):
       ret = "musicvideo"
     else:
       ret = "movie"  
-    
+  
     if settings.overwrite_cat:				#fix his out when other isn't the static light anymore
       if settings.overwrite_cat_val == 0:
         ret = "movie"
       else:
         ret = "musicvideo"
-  settings.handleCategory(ret, True)
+  settings.handleCategory(ret)
 
-platform = get_platform()
-libpath  = get_libpath(platform)
-loaded   = bob.bob_loadLibBoblight(libpath)
 
-if loaded == 1:            #libboblight not found
-#ask user if we should fetch the lib for osx and windows
-  if platform == 'osx' or platform == 'win32':
-    t1 = __language__(504)
-    t2 = __language__(509)
-    if xbmcgui.Dialog().yesno(__scriptname__,t1,t2):
-      tools_downloadLibBoblight(platform)
-      loaded = bob.bob_loadLibBoblight(libpath)
+if ( __name__ == "__main__" ):
+  platform = get_platform()
+  libpath  = get_libpath(platform)
+  loaded   = bob.bob_loadLibBoblight(libpath)
   
-  if platform == 'linux':
-    t1 = __language__(504)
-    t2 = __language__(505)
-    t3 = __language__(506)
-    xbmcgui.Dialog().ok(__scriptname__,t1,t2,t3)
-elif loaded == 2:        #no ctypes available
-  t1 = __language__(507)
-  t2 = __language__(508)
-  xbmcgui.Dialog().ok(__scriptname__,t1,t2) 
-
-if loaded == 0:
-  if reconnectBoblight():
-    printLights()         #print found lights to debuglog
-    showRgbBobInit()      #init light bling bling
-    process_boblight()    #boblight loop
-
-#cleanup
-bob.bob_destroy()
+  if loaded == 1:           #libboblight not found
+                            #ask user if we should fetch the lib for osx and windows
+    if platform == 'osx' or platform == 'win32':
+      t1 = __language__(504)
+      t2 = __language__(509)
+      if xbmcgui.Dialog().yesno(__scriptname__,t1,t2):
+        tools_downloadLibBoblight(platform)
+        loaded = bob.bob_loadLibBoblight(libpath)
+    
+    if platform == 'linux':
+      t1 = __language__(504)
+      t2 = __language__(505)
+      t3 = __language__(506)
+      xbmcgui.Dialog().ok(__scriptname__,t1,t2,t3)
+  elif loaded == 2:         #no ctypes available
+    t1 = __language__(507)
+    t2 = __language__(508)
+    xbmcgui.Dialog().ok(__scriptname__,t1,t2) 
+  
+  if loaded == 0:
+    if reconnectBoblight():
+      settings.showRgbBobInit()      #init light bling bling
+      process_boblight()             #boblight loop
+  
+  #cleanup
+  bob.bob_destroy()
 
 

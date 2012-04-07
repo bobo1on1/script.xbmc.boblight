@@ -25,6 +25,7 @@ __addon__      = sys.modules[ "__main__" ].__addon__
 __cwd__        = sys.modules[ "__main__" ].__cwd__
 __icon__       = sys.modules[ "__main__" ].__icon__
 __language__   = sys.modules[ "__main__" ].__language__
+__ID__   = sys.modules[ "__main__" ].__ID__
 
 from boblight import *
 from tools import log
@@ -33,11 +34,12 @@ bob = Boblight()
 
 class settings():
   def __init__( self, *args, **kwargs ):
-    log('__init__')
+    log('settings() - __init__')
     self.start()
     
+    
   def start(self):
-    log('start')
+    log('settings() - start')
     self.saturation                 = -1.0 
     self.value                      = -1.0
     self.speed                      = -1.0
@@ -80,23 +82,12 @@ class settings():
       self.hostport = -1
     else:
       self.hostip          = __addon__.getSetting("hostip")
-      self.hostport        = int(__addon__.getSetting("hostport"))    
-
-  #configures boblight for the initial bling bling
-  def confForBobInit(self):
-    log('confForBobInit')
-    saturation,value,speed,autospeed,interpolation,threshold = self.setupForStatic()
-    bob.bob_setoption("saturation    " + str(saturation))
-    bob.bob_setoption("value         " + str(value))
-    bob.bob_setoption("speed         " + str(speed))
-    bob.bob_setoption("autospeed     " + str(autospeed))
-    bob.bob_setoption("interpolation " + str(interpolation))
-    bob.bob_setoption("threshold     " + str(threshold))
+      self.hostport        = int(__addon__.getSetting("hostport"))
 
   #handle boblight configuration from the "Movie" category
   #returns the new settings
   def setupForMovie(self):
-    log('setupForMovie')
+    log('settings() - setupForMovie')
   
     if self.movie_preset == 1:       #preset smooth
       saturation    = 3.0
@@ -124,7 +115,7 @@ class settings():
   #handle boblight configuration from the "MusicVideo" category
   #returns the new settings
   def setupForMusicVideo(self):
-    log('setupForMusicVideo')
+    log('settings() - setupForMusicVideo')
   
     if self.music_preset == 1:       #preset Ballad
       saturation    = 3.0
@@ -152,7 +143,7 @@ class settings():
   #handle boblight configuration from the "other" category
   #returns the new settings
   def setupForOther(self):
-    log('setupForOther')
+    log('settings() - setupForOther')
   # FIXME don't use them for now - reactivate when boblight works on non rendered scenes (e.x. menu)
   #  saturation      =  float(__addon__.getSetting("other_saturation"))
   #  value           =  float(__addon__.getSetting("other_value"))
@@ -165,7 +156,7 @@ class settings():
   #handle boblight configuration for static lights
   #returns the new settings
   def setupForStatic(self):
-    log('setupForStatic')
+    log('settings() - setupForStatic')
     saturation    = 4.0
     value         = 1.0
     speed         = 50.0
@@ -178,27 +169,27 @@ class settings():
   #this is used until category "other" can do real boblight
   #when no video is rendered
   #category - the category we are in currently
-  def handleStaticBgSettings(self, force=False):
-    screensaver = xbmc.getCondVisibility("System.ScreenSaverActive")
-    if (self.screensaver == screensaver) or force:
-      if (self.category == "other" and 
-              self.other_static_bg and  
-              (not (screensaver and self.other_static_onscreensaver))
-              ):#for now enable static light on other if settings want this
-        bob.bob_set_priority(128)                                  #allow lights to be turned on
-        rgb = (c_int * 3)(self.other_static_red,self.other_static_green,self.other_static_blue)
-        bob.bob_set_static_color(byref(rgb))
-        self.staticBobActive = True
-      else:
-        self.staticBobActive = False
-      self.screensaver = not screensaver  
+
+  def handleStaticBgSettings(self):
+    if (self.category == "other" and 
+            self.other_static_bg and  
+            (not (self.screensaver and self.other_static_onscreensaver))
+            ):#for now enable static light on other if settings want this
+      bob.bob_set_priority(128)                                  #allow lights to be turned on
+      xbmc.sleep(100)
+      rgb = (c_int * 3)(self.other_static_red,self.other_static_green,self.other_static_blue)
+      bob.bob_set_static_color(byref(rgb))
+      log('settings() - handleGlobalSettings')
+      self.staticBobActive = True
+    else:
+      self.staticBobActive = False 
 
   #handles the boblight configuration of all categorys
   #and applies changed settings to boblight
   #"movie","musicvideo" and "other
   #returns if a setting has been changed
   def handleGlobalSettings(self):
-    log('handleGlobalSettings - category [%s]' % self.category)
+    log('settings() - handleGlobalSettings')
     #call the right setup function according to categroy
     #switch case in python - dictionary with function pointers
     option = { "movie"      : self.setupForMovie,
@@ -210,11 +201,49 @@ class settings():
   #handle change of category we are in
   #"movie","musicvideo" or "other"
   #returns if category has changed  
-  def handleCategory(self, category, force = False):
-    log('handleCategory(%s)' % category)
+  def handleCategory(self, category):
+    log('settings() - handleCategory(%s)' % category)
     self.category = category
-    self.handleStaticBgSettings(force)
+    self.handleStaticBgSettings()
     if not self.staticBobActive:
       self.handleGlobalSettings()
 
+  #configures boblight for the initial bling bling
+  def confForBobInit(self):
+    log('confForBobInit')
+    saturation,value,speed,autospeed,interpolation,threshold = self.setupForStatic()
+    bob.bob_setoption("saturation    " + str(saturation))
+    bob.bob_setoption("value         " + str(value))
+    bob.bob_setoption("speed         " + str(speed))
+    bob.bob_setoption("autospeed     " + str(autospeed))
+    bob.bob_setoption("interpolation " + str(interpolation))
+    bob.bob_setoption("threshold     " + str(threshold))
+  
+  #print found lights to debuglog
+  def printLights(self):
+    nrLights = bob.bob_getnrlights()
+    log("settings() - Found %s lights" % str(nrLights))
+  
+    for i in range(0, nrLights):
+      lightname = bob.bob_getlightname(i)
+      log(lightname)
+
+  #do a initial bling bling with the lights
+  def showRgbBobInit(self):
+    self.printLights()
+    self.confForBobInit()
+    bob.bob_set_priority(128)   #allow lights to be turned on
+    rgb = (c_int * 3)(255,0,0)
+    bob.bob_set_static_color(byref(rgb))
+    xbmc.sleep(1500)
+    rgb = (c_int * 3)(0,255,0)
+    bob.bob_set_static_color(byref(rgb))
+    xbmc.sleep(1500)
+    rgb = (c_int * 3)(0,0,255)
+    bob.bob_set_static_color(byref(rgb))
+    xbmc.sleep(1500)
+    rgb = (c_int * 3)(0,0,0)
+    bob.bob_set_static_color(byref(rgb))
+    xbmc.sleep(1500)
+    bob.bob_set_priority(255) #turn the lights off 
 

@@ -151,6 +151,7 @@ class Boblight():
   def bob_destroy(self):
     if self.boblightLoaded:
       self.libboblight.boblight_destroy(self.bobHandle)
+      self.boblightLoaded = False
   
   def bob_geterror(self):
     ret = ""
