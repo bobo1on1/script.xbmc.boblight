@@ -35,12 +35,13 @@ bob = Boblight()
 class settings():
   def __init__( self, *args, **kwargs ):
     log('settings() - __init__')
+    self.staticBobActive            = False
+    self.category                   = "static"
     self.start()
      
   def start(self):
     log('settings() - start')
-    self.staticBobActive            = False
-    self.category                   = "static"
+    self.force_update               = True    
     self.networkaccess              = __addon__.getSetting("networkaccess") == "true"
     self.overwrite_cat              = __addon__.getSetting("overwrite_cat") == "true"
     self.overwrite_cat_val          = int(__addon__.getSetting("overwrite_cat_val"))
@@ -207,7 +208,7 @@ class settings():
       
     
   def set_option(self,saturation,value,speed,autospeed,interpolation,threshold):
-    if self.current_option != self.category:
+    if (self.current_option != self.category) or self.force_update:
       log('settings() - set_option')
       ret = bob.bob_setoption("saturation    %s" % str(saturation))
       log("changed saturation    to %s (ret: %s)" % (str(saturation),ret))
@@ -223,6 +224,7 @@ class settings():
       log("changed threshold     to %s (ret: %s)" % (str(threshold),ret))
       
       self.current_option = self.category
+      self.force_update = False
 
   #configures boblight for the initial bling bling
   def confForBobInit(self):

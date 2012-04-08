@@ -67,6 +67,7 @@ class MyMonitor( xbmc.Monitor ):
           
     def onSettingsChanged( self ):
         settings.start()
+        settings.handleGlobalSettings()
         settings.handleStaticBgSettings()
         
     def onScreensaverDeactivated( self ):
@@ -161,7 +162,7 @@ def connectBoblight():
 
 def myPlayerChanged(state):
   log('PlayerChanged(%s)' % state)
-  xbmc.sleep(200)
+  xbmc.sleep(500)
   if state == 'stop':
     ret = "other"
   else:
@@ -170,7 +171,7 @@ def myPlayerChanged(state):
     else:
       ret = "movie"  
   
-    if settings.overwrite_cat:                  # fix his out when other isn't
+    if settings.overwrite_cat:				          # fix his out when other isn't
       if settings.overwrite_cat_val == 0:       # the static light anymore
         ret = "movie"
       else:
