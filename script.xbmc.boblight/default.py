@@ -45,45 +45,62 @@ capture_height = 32
 settings = settings()
 
 class MyPlayer( xbmc.Player ):
-    def __init__( self, *args, **kwargs ):
-        xbmc.Player.__init__( self )
-        log('MyPlayer - init')
-        self.function = kwargs[ "function" ]
-        self.function( 'stop' )
-          
-    def onPlayBackStopped( self ):
-        self.function( 'stop' )
+  def __init__( self, *args, **kwargs ):
+    xbmc.Player.__init__( self )
+    log('MyPlayer - init')
+    self.myPlayerChanged( 'stop' )
+
+  def myPlayerChanged(self, state):
+    log('PlayerChanged(%s)' % state)
+    xbmc.sleep(500)
+    if state == 'stop':
+      ret = "other"
+    else:
+      if xbmc.getCondVisibility("VideoPlayer.Content(musicvideos)"):
+        ret = "musicvideo"
+      else:
+        ret = "movie"  
     
-    def onPlayBackEnded( self ):
-        self.function( 'stop' )     
-    
-    def onPlayBackStarted( self ):
-        self.function( 'start' )
+      if settings.overwrite_cat:				          # fix his out when other isn't
+        if settings.overwrite_cat_val == 0:       # the static light anymore
+          ret = "movie"
+        else:
+          ret = "musicvideo"
+    settings.handleCategory(ret)
+        
+  def onPlayBackStopped( self ):
+    self.myPlayerChanged( 'stop' )
+  
+  def onPlayBackEnded( self ):
+    self.myPlayerChanged( 'stop' )     
+  
+  def onPlayBackStarted( self ):
+    self.myPlayerChanged( 'start' )
 
 class MyMonitor( xbmc.Monitor ):
-    def __init__( self, *args, **kwargs ):
-        xbmc.Monitor.__init__( self )
-        log('MyMonitor - init')
-          
-    def onSettingsChanged( self ):
-        settings.start()
-        settings.handleGlobalSettings()
-        settings.handleStaticBgSettings()
+  def __init__( self, *args, **kwargs ):
+    xbmc.Monitor.__init__( self )
+    log('MyMonitor - init')
         
-    def onScreensaverDeactivated( self ):
-        settings.screensaver = False
-        settings.handleStaticBgSettings()
-        
-    def onScreensaverActivated( self ):    
-        settings.screensaver = True
-        settings.handleStaticBgSettings()
+  def onSettingsChanged( self ):
+    settings.start()
+    settings.handleGlobalSettings()
+    settings.handleStaticBgSettings()
+      
+  def onScreensaverDeactivated( self ):
+    settings.screensaver = False
+    settings.handleStaticBgSettings()
+      
+  def onScreensaverActivated( self ):    
+    settings.screensaver = True
+    settings.handleStaticBgSettings()
 
 
 def process_boblight():
   capture = xbmc.RenderCapture()
   capture.capture(capture_width, capture_height, xbmc.CAPTURE_FLAG_CONTINUOUS)
   xbmc_monitor   = MyMonitor()
-  player_monitor = MyPlayer(function=myPlayerChanged)
+  player_monitor = MyPlayer()
   
   bobdisable = False
   while not xbmc.abortRequested:
@@ -159,25 +176,6 @@ def connectBoblight():
       log("connected to boblightd")
       break
   return True
-
-def myPlayerChanged(state):
-  log('PlayerChanged(%s)' % state)
-  xbmc.sleep(500)
-  if state == 'stop':
-    ret = "other"
-  else:
-    if xbmc.getCondVisibility("VideoPlayer.Content(musicvideos)"):
-      ret = "musicvideo"
-    else:
-      ret = "movie"  
-  
-    if settings.overwrite_cat:				          # fix his out when other isn't
-      if settings.overwrite_cat_val == 0:       # the static light anymore
-        ret = "movie"
-      else:
-        ret = "musicvideo"
-  settings.handleCategory(ret)
-
 
 if ( __name__ == "__main__" ):
   platform = get_platform()
