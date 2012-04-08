@@ -81,17 +81,16 @@ class MyMonitor( xbmc.Monitor ):
 def process_boblight():
   capture = xbmc.RenderCapture()
   capture.capture(capture_width, capture_height, xbmc.CAPTURE_FLAG_CONTINUOUS)
+  xbmc_monitor   = MyMonitor()
   player_monitor = MyPlayer(function=myPlayerChanged)
-  xbmc_monitor = MyMonitor()
   
   bobdisable = False
   while not xbmc.abortRequested:
     xbmc.sleep(100)
     if not settings.bobdisable:
-
       bobdisable = True
       if not bob.bob_ping():
-        reconnectBoblight()
+        connectBoblight()
         
       capture.waitForCaptureStateChangeEvent(1000)
       if capture.getCaptureState() == xbmc.CAPTURE_STATE_DONE:
@@ -112,7 +111,7 @@ def process_boblight():
             bob.bob_addpixelxy(x, y, byref(rgb))
   
         if not bob.bob_sendrgb():
-          log("boblight: error sending values: %s" % bob.bob_geterror())
+          log("error sending values: %s" % bob.bob_geterror())
           return
       else:
         if not settings.staticBobActive:  #don't kill the lights in accident here
@@ -130,7 +129,7 @@ def process_boblight():
   xbmc.sleep(50)
   del xbmc_monitor
 
-def reconnectBoblight():  
+def connectBoblight():  
   failedConnectionNotified = False 
   hostip   = settings.hostip
   hostport = settings.hostport
@@ -171,8 +170,8 @@ def myPlayerChanged(state):
     else:
       ret = "movie"  
   
-    if settings.overwrite_cat:				#fix his out when other isn't the static light anymore
-      if settings.overwrite_cat_val == 0:
+    if settings.overwrite_cat:                  # fix his out when other isn't
+      if settings.overwrite_cat_val == 0:       # the static light anymore
         ret = "movie"
       else:
         ret = "musicvideo"
@@ -184,30 +183,30 @@ if ( __name__ == "__main__" ):
   libpath  = get_libpath(platform)
   loaded   = bob.bob_loadLibBoblight(libpath)
   
-  if loaded == 1:           #libboblight not found
-                            #ask user if we should fetch the lib for osx and windows
-    if platform == 'osx' or platform == 'win32':
-      t1 = __language__(504)
+  if loaded == 1:                                #libboblight not found                                               
+    if platform == 'osx' or platform == 'win32': # ask user if we should fetch the
+      t1 = __language__(504)                     # lib for osx and windows
       t2 = __language__(509)
       if xbmcgui.Dialog().yesno(__scriptname__,t1,t2):
         tools_downloadLibBoblight(platform)
         loaded = bob.bob_loadLibBoblight(libpath)
     
-    if platform == 'linux':
+    elif platform == 'linux':
       t1 = __language__(504)
       t2 = __language__(505)
       t3 = __language__(506)
       xbmcgui.Dialog().ok(__scriptname__,t1,t2,t3)
+      
   elif loaded == 2:         #no ctypes available
     t1 = __language__(507)
     t2 = __language__(508)
     xbmcgui.Dialog().ok(__scriptname__,t1,t2) 
   
-  if loaded == 0:
-    if reconnectBoblight():
-      settings.showRgbBobInit()      #init light bling bling
+  elif loaded == 0:
+    if connectBoblight():
+      settings.confForBobInit()      #init light bling bling
       process_boblight()             #boblight loop
-  
+       
   #cleanup
   bob.bob_destroy()
 

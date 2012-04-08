@@ -36,53 +36,49 @@ class settings():
   def __init__( self, *args, **kwargs ):
     log('settings() - __init__')
     self.start()
-    
-    
+     
   def start(self):
     log('settings() - start')
-    self.saturation                 = -1.0 
-    self.value                      = -1.0
-    self.speed                      = -1.0
-    self.autospeed                  = -1.0
-    self.interpolation              = -1
-    self.threshold                  = -1.0
     self.staticBobActive            = False
-    self.category                   = "other"
+    self.category                   = "static"
     self.networkaccess              = __addon__.getSetting("networkaccess") == "true"
     self.overwrite_cat              = __addon__.getSetting("overwrite_cat") == "true"
     self.overwrite_cat_val          = int(__addon__.getSetting("overwrite_cat_val"))
+    self.screensaver                = xbmc.getCondVisibility("System.ScreenSaverActive")
+    self.bobdisable                 = __addon__.getSetting("bobdisable") == "true"
+    self.current_option             = ""
+    
+    if not self.networkaccess:
+      self.hostip   = None
+      self.hostport = -1
+    else:
+      self.hostip                   = __addon__.getSetting("hostip")
+      self.hostport                 = int(__addon__.getSetting("hostport"))
+    
+    # Other settings
     self.other_static_bg            = __addon__.getSetting("other_static_bg") == "true"
     self.other_static_red           = int(float(__addon__.getSetting("other_static_red")))
     self.other_static_green         = int(float(__addon__.getSetting("other_static_green")))
     self.other_static_blue          = int(float(__addon__.getSetting("other_static_blue")))
     self.other_static_onscreensaver = __addon__.getSetting("other_static_onscreensaver") == "true"
-    self.screensaver                = xbmc.getCondVisibility("System.ScreenSaverActive")
-    self.bobdisable                 = __addon__.getSetting("bobdisable") == "true"
     
     # Movie settings
-    self.movie_saturation           =  float(__addon__.getSetting("movie_saturation"))
-    self.movie_value                =  float(__addon__.getSetting("movie_value"))
-    self.movie_speed                =  float(__addon__.getSetting("movie_speed"))
-    self.movie_autospeed            =  float(__addon__.getSetting("movie_autospeed"))
-    self.movie_interpolation        =  __addon__.getSetting("movie_interpolation") == "true"
-    self.movie_threshold            =  float(__addon__.getSetting("movie_threshold"))
+    self.movie_saturation           = float(__addon__.getSetting("movie_saturation"))
+    self.movie_value                = float(__addon__.getSetting("movie_value"))
+    self.movie_speed                = float(__addon__.getSetting("movie_speed"))
+    self.movie_autospeed            = float(__addon__.getSetting("movie_autospeed"))
+    self.movie_interpolation        = int(__addon__.getSetting("movie_interpolation") == "true")
+    self.movie_threshold            = float(__addon__.getSetting("movie_threshold"))
     self.movie_preset               = int(__addon__.getSetting("movie_preset"))
     
     # Music Video settings
-    self.music_saturation           =  float(__addon__.getSetting("musicvideo_saturation"))
-    self.music_value                =  float(__addon__.getSetting("musicvideo_value"))
-    self.music_speed                =  float(__addon__.getSetting("musicvideo_speed"))
-    self.music_autospeed            =  float(__addon__.getSetting("movie_autospeed"))
-    self.music_interpolation        =  __addon__.getSetting("musicvideo_interpolation") == "true"
-    self.music_threshold            =  float(__addon__.getSetting("musicvideo_threshold"))
+    self.music_saturation           = float(__addon__.getSetting("musicvideo_saturation"))
+    self.music_value                = float(__addon__.getSetting("musicvideo_value"))
+    self.music_speed                = float(__addon__.getSetting("musicvideo_speed"))
+    self.music_autospeed            = float(__addon__.getSetting("movie_autospeed"))
+    self.music_interpolation        = int(__addon__.getSetting("musicvideo_interpolation") == "true")
+    self.music_threshold            = float(__addon__.getSetting("musicvideo_threshold"))
     self.music_preset               = int(__addon__.getSetting("musicvideo_preset"))
-
-    if not self.networkaccess:
-      self.hostip   = None
-      self.hostport = -1
-    else:
-      self.hostip          = __addon__.getSetting("hostip")
-      self.hostport        = int(__addon__.getSetting("hostport"))
 
   #handle boblight configuration from the "Movie" category
   #returns the new settings
@@ -171,18 +167,18 @@ class settings():
   #category - the category we are in currently
 
   def handleStaticBgSettings(self):
+    log('settings() - handleStaticBgSettings')
     if (self.category == "other" and 
             self.other_static_bg and  
             (not (self.screensaver and self.other_static_onscreensaver))
             ):#for now enable static light on other if settings want this
       bob.bob_set_priority(128)                                  #allow lights to be turned on
-      xbmc.sleep(100)
       rgb = (c_int * 3)(self.other_static_red,self.other_static_green,self.other_static_blue)
       bob.bob_set_static_color(byref(rgb))
-      log('settings() - handleGlobalSettings')
       self.staticBobActive = True
+      log('settings() - handleStaticBgSettings[Active]')
     else:
-      self.staticBobActive = False 
+      self.staticBobActive = False
 
   #handles the boblight configuration of all categorys
   #and applies changed settings to boblight
@@ -195,8 +191,10 @@ class settings():
     option = { "movie"      : self.setupForMovie,
                "musicvideo" : self.setupForMusicVideo,
                "other"      : self.setupForOther,
+               "static"     : self.setupForStatic, 
     }
-    self.saturation,self.value,self.speed,self.autospeed,self.interpolation,self.threshold = option[self.category]()
+    saturation,value,speed,autospeed,interpolation,threshold = option[self.category]()
+    self.set_option(saturation,value,speed,autospeed,interpolation,threshold)
   
   #handle change of category we are in
   #"movie","musicvideo" or "other"
@@ -204,35 +202,40 @@ class settings():
   def handleCategory(self, category):
     log('settings() - handleCategory(%s)' % category)
     self.category = category
+    self.handleGlobalSettings()
     self.handleStaticBgSettings()
-    if not self.staticBobActive:
-      self.handleGlobalSettings()
+      
+    
+  def set_option(self,saturation,value,speed,autospeed,interpolation,threshold):
+    if self.current_option != self.category:
+      log('settings() - set_option')
+      ret = bob.bob_setoption("saturation    %s" % str(saturation))
+      log("changed saturation    to %s (ret: %s)" % (str(saturation),ret))
+      ret = bob.bob_setoption("value         %s" % str(value))
+      log("changed value         to %s (ret: %s)" % (str(value),ret))
+      ret = bob.bob_setoption("speed         %s" % str(speed))
+      log("changed speed         to %s (ret: %s)" % (str(speed),ret))
+      ret = bob.bob_setoption("autospeed     %s" % str(autospeed))
+      log("changed autospeed     to %s (ret: %s)" % (str(autospeed),ret))
+      ret = bob.bob_setoption("interpolation %s" % str(interpolation))
+      log("changed interpolation to %s (ret: %s)" % (str(interpolation),ret))
+      ret = bob.bob_setoption("threshold     %s" % str(threshold))
+      log("changed threshold     to %s (ret: %s)" % (str(threshold),ret))
+      
+      self.current_option = self.category
 
   #configures boblight for the initial bling bling
   def confForBobInit(self):
     log('confForBobInit')
-    saturation,value,speed,autospeed,interpolation,threshold = self.setupForStatic()
-    bob.bob_setoption("saturation    " + str(saturation))
-    bob.bob_setoption("value         " + str(value))
-    bob.bob_setoption("speed         " + str(speed))
-    bob.bob_setoption("autospeed     " + str(autospeed))
-    bob.bob_setoption("interpolation " + str(interpolation))
-    bob.bob_setoption("threshold     " + str(threshold))
-  
-  #print found lights to debuglog
-  def printLights(self):
     nrLights = bob.bob_getnrlights()
     log("settings() - Found %s lights" % str(nrLights))
-  
     for i in range(0, nrLights):
       lightname = bob.bob_getlightname(i)
       log(lightname)
+    
+    self.handleGlobalSettings()
 
-  #do a initial bling bling with the lights
-  def showRgbBobInit(self):
-    self.printLights()
-    self.confForBobInit()
-    bob.bob_set_priority(128)   #allow lights to be turned on
+    bob.bob_set_priority(128)           #allow lights to be turned on
     rgb = (c_int * 3)(255,0,0)
     bob.bob_set_static_color(byref(rgb))
     xbmc.sleep(1500)
@@ -245,5 +248,5 @@ class settings():
     rgb = (c_int * 3)(0,0,0)
     bob.bob_set_static_color(byref(rgb))
     xbmc.sleep(1500)
-    bob.bob_set_priority(255) #turn the lights off 
+    bob.bob_set_priority(255)           #turn the lights off   
 
