@@ -108,8 +108,6 @@ class Boblight():
     ret = False
     if self.boblightLoaded and self.connected:
       ret = c_int(self.libboblight.boblight_sendrgb(self.bobHandle, 1, None))  != 0
-    else:
-      ret = True
     return ret
     
   def bob_setoption(self,option):
@@ -144,9 +142,11 @@ class Boblight():
     return self.connected
     
   def bob_set_static_color(self,rgb):
+    res = False
     if self.boblightLoaded and self.connected:
       self.bob_addpixel(rgb)
-      self.bob_sendrgb()
+      res = self.bob_sendrgb()
+    return res  
   
   def bob_destroy(self):
     if self.boblightLoaded:

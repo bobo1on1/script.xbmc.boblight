@@ -175,7 +175,8 @@ class settings():
             ):#for now enable static light on other if settings want this
       bob.bob_set_priority(128)                                  #allow lights to be turned on
       rgb = (c_int * 3)(self.other_static_red,self.other_static_green,self.other_static_blue)
-      bob.bob_set_static_color(byref(rgb))
+      ret = bob.bob_set_static_color(byref(rgb))
+      log('settings() - bob.bob_set_static_color = %s' % ret)
       self.staticBobActive = True
       log('settings() - handleStaticBgSettings[Active]')
     else:
