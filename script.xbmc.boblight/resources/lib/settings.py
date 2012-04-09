@@ -129,12 +129,12 @@ class settings():
       interpolation = 0
       threshold     = 0.0
     elif self.music_preset == 0:     #custom
-      saturation      =  self.movie_saturation
-      value           =  self.movie_value
-      speed           =  self.movie_speed
-      autospeed       =  self.movie_autospeed
-      interpolation   =  self.movie_interpolation
-      threshold       =  self.movie_threshold    
+      saturation      =  self.music_saturation
+      value           =  self.music_value
+      speed           =  self.music_speed
+      autospeed       =  self.music_autospeed
+      interpolation   =  self.music_interpolation
+      threshold       =  self.music_threshold    
     return (saturation,value,speed,autospeed,interpolation,threshold)
   
   #handle boblight configuration from the "other" category
