@@ -111,7 +111,7 @@ def process_boblight():
         connectBoblight()
         
       capture.waitForCaptureStateChangeEvent(1000)
-      if capture.getCaptureState() == xbmc.CAPTURE_STATE_DONE:
+      if capture.getCaptureState() == xbmc.CAPTURE_STATE_DONE and not settings.staticBobActive:
         if not bob.bob_set_priority(128):
           return
   
