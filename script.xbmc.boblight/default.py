@@ -131,10 +131,6 @@ def process_boblight():
         if not bob.bob_sendrgb():
           log("error sending values: %s" % bob.bob_geterror())
           return
-      else:
-        if not settings.staticBobActive:  #don't kill the lights in accident here
-          if not bob.bob_set_priority(255):
-            return
             
     elif bobdisable:
       log('boblight disabled in Addon Settings')
