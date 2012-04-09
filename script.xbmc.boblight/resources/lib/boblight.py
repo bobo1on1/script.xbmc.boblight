@@ -42,8 +42,6 @@ c_int(self.libboblight.boblight_ping(boblight, int* outputused))
 import sys
 import os
 
-from tools import log
-
 try:
   from ctypes import *
   HAVE_CTYPES = True
@@ -75,10 +73,8 @@ class Boblight():
           self.bobHandle = c_void_p(self.libboblight.boblight_init(None))
           
       except:
-        log("Error loading %s - only demo mode." % libname )
         ret = 1
     else:
-      log("No ctypes available - only demo mode.")
       ret = 2
     return ret
   
@@ -88,7 +84,6 @@ class Boblight():
       if priority != self.current_priority:
         self.current_priority = priority
         if not self.libboblight.boblight_setpriority(self.bobHandle, self.current_priority):
-          log("error setting priority: %s" % c_char_p(self.libboblight.boblight_geterror(self.bobHandle)).value)
           ret = False
     return ret
     
