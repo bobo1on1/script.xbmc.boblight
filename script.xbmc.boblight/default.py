@@ -58,7 +58,7 @@ class MyPlayer( xbmc.Player ):
     log('PlayerChanged(%s)' % state)
     xbmc.sleep(500)
     if state == 'stop':
-      ret = "other"
+      ret = "static"
     else:
       if xbmc.getCondVisibility("VideoPlayer.Content(musicvideos)"):
         ret = "musicvideo"
@@ -204,7 +204,7 @@ if ( __name__ == "__main__" ):
   elif loaded == 0:
     if connectBoblight():
       settings.bob_init()      #init light bling bling
-      process_boblight()             #boblight loop
+      process_boblight()       #boblight loop
        
   #cleanup
   bob.bob_destroy()

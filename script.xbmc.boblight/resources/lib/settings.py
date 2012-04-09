@@ -32,6 +32,9 @@ from tools import log
 
 bob = Boblight()
 
+BLING = [[255,0,0],[0,255,0],[0,0,255],[0,0,0]]
+OPTS  = ['saturation','value','speed','autospeed','interpolation','threshold']
+
 class settings():
   def __init__( self, *args, **kwargs ):
     log('settings() - __init__')
@@ -168,18 +171,19 @@ class settings():
 
   def handleStaticBgSettings(self):
     log('settings() - handleStaticBgSettings')
-    if (self.category == "other" and                  # only for 'other' category
+    if (self.category == "static" and                 # only for 'static' category
             self.other_static_bg and                  # only if we want it displayed on static
-            (not (self.screensaver and
+            (not (self.screensaver and 
                   self.other_static_onscreensaver))   # only if screen saver is off and we want it on
             ):
       bob.bob_set_priority(128)                       # allow lights to be turned on
-      rgb = (c_int * 3)(self.other_static_red,self.other_static_green,self.other_static_blue)
+      rgb = (c_int * 3)(self.other_static_red,
+                        self.other_static_green,
+                        self.other_static_blue)
       ret = bob.bob_set_static_color(byref(rgb))
-      log('settings() - bob.bob_set_static_color = %s' % ret)
       self.staticBobActive = True
-      log('settings() - handleStaticBgSettings[Active]')
     else:
+      bob.bob_set_priority(255)
       self.staticBobActive = False
 
   #handles the boblight configuration of all categorys
@@ -187,67 +191,41 @@ class settings():
   #"movie","musicvideo", "other and "static"
   def handleGlobalSettings(self):
     log('settings() - handleGlobalSettings')
-    #call the right setup function according to categroy
-    #switch case in python - dictionary with function pointers
-    option = { "movie"      : self.setupForMovie,
-               "musicvideo" : self.setupForMusicVideo,
-               "other"      : self.setupForOther,
-               "static"     : self.setupForStatic, 
-    }
-    saturation,value,speed,autospeed,interpolation,threshold = option[self.category]()
-    self.set_option(saturation,value,speed,autospeed,interpolation,threshold)
+    if (self.current_option != self.category) or self.force_update:
+      #call the right setup function according to categroy
+      #switch case in python - dictionary with function pointers
+      option = { "movie"      : self.setupForMovie,
+                 "musicvideo" : self.setupForMusicVideo,
+                 "other"      : self.setupForOther,
+                 "static"     : self.setupForStatic, 
+      }
+      saturation,value,speed,autospeed,interpolation,threshold = option[self.category]()
+      for opt in OPTS:
+        ret = bob.bob_setoption("%s    %s" % (opt,str(locals()[opt])))
+        log("changed %s    to %s ret:  %s" % (opt,str(locals()[opt]),ret))          
+      self.current_option = self.category
+      self.force_update = False
   
-  #handle change of category we are in
-  #"movie","musicvideo" or "other"
-  #returns if category has changed  
+  #handle change of category we are calling
   def handleCategory(self, category):
     log('settings() - handleCategory(%s)' % category)
     self.category = category
     self.handleGlobalSettings()
     self.handleStaticBgSettings()
-      
-    
-  def set_option(self,saturation,value,speed,autospeed,interpolation,threshold):
-    if (self.current_option != self.category) or self.force_update:
-      log('settings() - set_option')
-      ret = bob.bob_setoption("saturation    %s" % str(saturation))
-      log("changed saturation    to %s (ret: %s)" % (str(saturation),ret))
-      ret = bob.bob_setoption("value         %s" % str(value))
-      log("changed value         to %s (ret: %s)" % (str(value),ret))
-      ret = bob.bob_setoption("speed         %s" % str(speed))
-      log("changed speed         to %s (ret: %s)" % (str(speed),ret))
-      ret = bob.bob_setoption("autospeed     %s" % str(autospeed))
-      log("changed autospeed     to %s (ret: %s)" % (str(autospeed),ret))
-      ret = bob.bob_setoption("interpolation %s" % str(interpolation))
-      log("changed interpolation to %s (ret: %s)" % (str(interpolation),ret))
-      ret = bob.bob_setoption("threshold     %s" % str(threshold))
-      log("changed threshold     to %s (ret: %s)" % (str(threshold),ret))
-      
-      self.current_option = self.category
-      self.force_update = False
 
   def bob_init(self):
     log('bob_init')
     nrLights = bob.bob_getnrlights()
     log("settings() - Found %s lights" % str(nrLights))
-    for i in range(0, nrLights):
+    for i in range(nrLights):
       lightname = bob.bob_getlightname(i)
-      log(lightname)
+      log("settings() - Light[%.2d] - %s" % (i+1, lightname))
     
     self.handleGlobalSettings()
-
-    bob.bob_set_priority(128)           #allow lights to be turned on
-    rgb = (c_int * 3)(255,0,0)
-    bob.bob_set_static_color(byref(rgb))
-    xbmc.sleep(1500)
-    rgb = (c_int * 3)(0,255,0)
-    bob.bob_set_static_color(byref(rgb))
-    xbmc.sleep(1500)
-    rgb = (c_int * 3)(0,0,255)
-    bob.bob_set_static_color(byref(rgb))
-    xbmc.sleep(1500)
-    rgb = (c_int * 3)(0,0,0)
-    bob.bob_set_static_color(byref(rgb))
-    xbmc.sleep(1500)
-    bob.bob_set_priority(255)           #turn the lights off   
+    bob.bob_set_priority(128)           # allow lights to be turned on, we will switch them off
+                                        # in 'handleStaticBgSettings()' if they are not needed
+    for i in range(len(BLING)):
+      rgb = (c_int * 3)(BLING[i][0],BLING[i][1],BLING[i][2])
+      bob.bob_set_static_color(byref(rgb))
+      xbmc.sleep(1000)
 
