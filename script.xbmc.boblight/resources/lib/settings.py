@@ -165,15 +165,15 @@ class settings():
   #handle all settings according to the static bg light
   #this is used until category "other" can do real boblight
   #when no video is rendered
-  #category - the category we are in currently
 
   def handleStaticBgSettings(self):
     log('settings() - handleStaticBgSettings')
-    if (self.category == "other" and 
-            self.other_static_bg and  
-            (not (self.screensaver and self.other_static_onscreensaver))
-            ):#for now enable static light on other if settings want this
-      bob.bob_set_priority(128)                                  #allow lights to be turned on
+    if (self.category == "other" and                  # only for 'other' category
+            self.other_static_bg and                  # only if we want it displayed on static
+            (not (self.screensaver and
+                  self.other_static_onscreensaver))   # only if screen saver is off and we want it on
+            ):
+      bob.bob_set_priority(128)                       # allow lights to be turned on
       rgb = (c_int * 3)(self.other_static_red,self.other_static_green,self.other_static_blue)
       ret = bob.bob_set_static_color(byref(rgb))
       log('settings() - bob.bob_set_static_color = %s' % ret)
@@ -184,8 +184,7 @@ class settings():
 
   #handles the boblight configuration of all categorys
   #and applies changed settings to boblight
-  #"movie","musicvideo" and "other
-  #returns if a setting has been changed
+  #"movie","musicvideo", "other and "static"
   def handleGlobalSettings(self):
     log('settings() - handleGlobalSettings')
     #call the right setup function according to categroy
@@ -227,9 +226,8 @@ class settings():
       self.current_option = self.category
       self.force_update = False
 
-  #configures boblight for the initial bling bling
-  def confForBobInit(self):
-    log('confForBobInit')
+  def bob_init(self):
+    log('bob_init')
     nrLights = bob.bob_getnrlights()
     log("settings() - Found %s lights" % str(nrLights))
     for i in range(0, nrLights):

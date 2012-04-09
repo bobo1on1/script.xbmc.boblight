@@ -199,7 +199,7 @@ if ( __name__ == "__main__" ):
   
   elif loaded == 0:
     if connectBoblight():
-      settings.confForBobInit()      #init light bling bling
+      settings.bob_init()      #init light bling bling
       process_boblight()             #boblight loop
        
   #cleanup
