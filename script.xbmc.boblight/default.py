@@ -48,7 +48,11 @@ class MyPlayer( xbmc.Player ):
   def __init__( self, *args, **kwargs ):
     xbmc.Player.__init__( self )
     log('MyPlayer - init')
-    self.myPlayerChanged( 'stop' )
+    if self.isPlaying():
+      state = 'start'
+    else:
+      state = 'stop'  
+    self.myPlayerChanged( state )    
 
   def myPlayerChanged(self, state):
     log('PlayerChanged(%s)' % state)
