@@ -114,28 +114,29 @@ def process_boblight():
       if not bob.bob_ping():
         connectBoblight()
         
-      capture.waitForCaptureStateChangeEvent(1000)
-      if capture.getCaptureState() == xbmc.CAPTURE_STATE_DONE and not settings.staticBobActive:
-        if not bob.bob_set_priority(128):
-          return
-  
-        width = capture.getWidth();
-        height = capture.getHeight();
-        pixels = capture.getImage();
-        bob.bob_setscanrange(width, height)
-        rgb = (c_int * 3)()
-        for y in range(height):
-          row = width * y * 4
-          for x in range(width):
-            rgb[0] = pixels[row + x * 4 + 2]
-            rgb[1] = pixels[row + x * 4 + 1]
-            rgb[2] = pixels[row + x * 4]
-            bob.bob_addpixelxy(x, y, byref(rgb))
-  
-        if not bob.bob_sendrgb():
-          log("error sending values: %s" % bob.bob_geterror())
-          return
-            
+      if not settings.staticBobActive:        
+        capture.waitForCaptureStateChangeEvent(1000)
+        if capture.getCaptureState() == xbmc.CAPTURE_STATE_DONE:
+          if not bob.bob_set_priority(128):
+            return
+    
+          width = capture.getWidth();
+          height = capture.getHeight();
+          pixels = capture.getImage();
+          bob.bob_setscanrange(width, height)
+          rgb = (c_int * 3)()
+          for y in range(height):
+            row = width * y * 4
+            for x in range(width):
+              rgb[0] = pixels[row + x * 4 + 2]
+              rgb[1] = pixels[row + x * 4 + 1]
+              rgb[2] = pixels[row + x * 4]
+              bob.bob_addpixelxy(x, y, byref(rgb))
+    
+          if not bob.bob_sendrgb():
+            log("error sending values: %s" % bob.bob_geterror())
+            return
+                      
     elif bobdisable:
       log('boblight disabled in Addon Settings')
       bobdisable = False
