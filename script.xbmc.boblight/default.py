@@ -202,7 +202,7 @@ if ( __name__ == "__main__" ):
     t2 = __language__(508)
     xbmcgui.Dialog().ok(__scriptname__,t1,t2) 
   
-  elif loaded == 0:
+  if loaded == 0:
     if connectBoblight():
       settings.bob_init()      #init light bling bling
       process_boblight()       #boblight loop
