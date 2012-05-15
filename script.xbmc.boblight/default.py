@@ -45,7 +45,6 @@ class MyPlayer( xbmc.Player ):
   def __init__( self, *args, **kwargs ):
     xbmc.Player.__init__( self )
     log('MyPlayer - init')
-    self.check_state()
     
   def check_state(self): 
     if self.isPlaying():
@@ -158,12 +157,13 @@ class Main():
   
     return loaded  
 
-if ( __name__ == "__main__" ):
+def run_boblight():
+  main = Main()
   xbmc_monitor   = MyMonitor()
   player_monitor = MyPlayer()
-  main = Main()
   if main.startup() == 0 and main.connectBoblight(False):
     settings.bob_init()           #init light bling bling
+    player_monitor.check_state()
     capture_width = 32
     capture_height = 32
     capture        = xbmc.RenderCapture()
@@ -176,34 +176,39 @@ if ( __name__ == "__main__" ):
             player_monitor.check_state()
           settings.reconnect = False        
           
-        if not settings.staticBobActive:        
+        if not settings.staticBobActive:
           capture.waitForCaptureStateChangeEvent(1000)
           if capture.getCaptureState() == xbmc.CAPTURE_STATE_DONE:
-            if bob.bob_set_priority(128):
-              width = capture.getWidth();
-              height = capture.getHeight();
-              pixels = capture.getImage();
-              bob.bob_setscanrange(width, height)
-              rgb = (c_int * 3)()
-              for y in range(height):
-                row = width * y * 4
-                for x in range(width):
-                  rgb[0] = pixels[row + x * 4 + 2]
-                  rgb[1] = pixels[row + x * 4 + 1]
-                  rgb[2] = pixels[row + x * 4]
-                  bob.bob_addpixelxy(x, y, byref(rgb))
+            bob.bob_set_priority(128)
+            width = capture.getWidth();
+            height = capture.getHeight();
+            pixels = capture.getImage();
+            bob.bob_setscanrange(width, height)
+            rgb = (c_int * 3)()
+            for y in range(height):
+              row = width * y * 4
+              for x in range(width):
+                rgb[0] = pixels[row + x * 4 + 2]
+                rgb[1] = pixels[row + x * 4 + 1]
+                rgb[2] = pixels[row + x * 4]
+                bob.bob_addpixelxy(x, y, byref(rgb))
+            
+            if not bob.bob_sendrgb():
+              log("error sending values: %s" % bob.bob_geterror())
+              return   
                         
       else:
         log('boblight disabled in Addon Settings')
-        bobdisable = False
         bob.bob_set_priority(255)
-                         
-    
+        continue
 
-  bob.bob_set_priority(255) # we are shutting down, kill the LEDs     
   del main                  #cleanup
   del player_monitor
   del xbmc_monitor
+
+if ( __name__ == "__main__" ):
+  run_boblight()
+  bob.bob_set_priority(255) # we are shutting down, kill the LEDs     
   bob.bob_destroy()
 
 
