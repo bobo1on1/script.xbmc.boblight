@@ -40,12 +40,20 @@ class settings():
     log('settings() - __init__')
     self.staticBobActive            = False
     self.category                   = "static"
+    self.networkaccess              = __addon__.getSetting("networkaccess") == "true"
+    if not self.networkaccess:
+      self.hostip   = None
+      self.hostport = -1
+    else:
+      self.hostip                     = __addon__.getSetting("hostip")
+      self.hostport                   = int(__addon__.getSetting("hostport")) 
     self.start()
      
   def start(self):
     log('settings() - start')
-    self.force_update               = True    
-    self.networkaccess              = __addon__.getSetting("networkaccess") == "true"
+    self.reconnect                  = False
+    self.force_update               = True  
+    self.networkaccess              = __addon__.getSetting("networkaccess") == "true"  
     self.overwrite_cat              = __addon__.getSetting("overwrite_cat") == "true"
     self.overwrite_cat_val          = int(__addon__.getSetting("overwrite_cat_val"))
     self.screensaver                = xbmc.getCondVisibility("System.ScreenSaverActive")
@@ -55,9 +63,14 @@ class settings():
     if not self.networkaccess:
       self.hostip   = None
       self.hostport = -1
+      self.reconnect = True
     else:
-      self.hostip                   = __addon__.getSetting("hostip")
-      self.hostport                 = int(__addon__.getSetting("hostport"))
+      hostip                   = __addon__.getSetting("hostip")
+      hostport                 = int(__addon__.getSetting("hostport"))
+      if ((self.hostip != hostip) or (self.hostport != hostport)):
+        self.hostip   = hostip
+        self.hostport = hostport        
+        self.reconnect = True
     
     # Other settings
     self.other_static_bg            = __addon__.getSetting("other_static_bg") == "true"
