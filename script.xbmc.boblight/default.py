@@ -109,9 +109,9 @@ class Main():
     libpath  = get_libpath(platform)
     loaded   = bob.bob_loadLibBoblight(libpath)
   
-    if loaded == 1:                                #libboblight not found                                               
-      if platform == 'osx' or platform == 'win32': # ask user if we should fetch the
-        t1 = __language__(504)                     # lib for osx and windows
+    if loaded == 1:                                                     #libboblight not found                                               
+      if platform == 'osx' or platform == 'win32' or platform == 'ios': # ask user if we should fetch the
+        t1 = __language__(504)                                          # lib for osx and windows
         t2 = __language__(509)
         if xbmcgui.Dialog().yesno(__scriptname__,t1,t2):
           tools_downloadLibBoblight(platform)
