@@ -45,40 +45,15 @@ class MyPlayer( xbmc.Player ):
   def __init__( self, *args, **kwargs ):
     xbmc.Player.__init__( self )
     log('MyPlayer - init')
-    
-  def check_state(self): 
-    if self.isPlaying():
-      state = 'start'
-    else:
-      state = 'stop'  
-    self.myPlayerChanged( state )    
-
-  def myPlayerChanged(self, state):
-    log('PlayerChanged(%s)' % state)
-    xbmc.sleep(500)
-    if state == 'stop':
-      ret = "static"
-    else:
-      if xbmc.getCondVisibility("VideoPlayer.Content(musicvideos)"):
-        ret = "musicvideo"
-      else:
-        ret = "movie"  
-    
-      if settings.overwrite_cat:				          # fix his out when other isn't
-        if settings.overwrite_cat_val == 0:       # the static light anymore
-          ret = "movie"
-        else:
-          ret = "musicvideo"
-    settings.handleCategory(ret)
         
   def onPlayBackStopped( self ):
-    self.myPlayerChanged( 'stop' )
+    myPlayerChanged( 'stop' )
   
   def onPlayBackEnded( self ):
-    self.myPlayerChanged( 'stop' )     
+    myPlayerChanged( 'stop' )     
   
   def onPlayBackStarted( self ):
-    self.myPlayerChanged( 'start' )
+    myPlayerChanged( 'start' )
 
 class MyMonitor( xbmc.Monitor ):
   def __init__( self, *args, **kwargs ):
@@ -87,9 +62,7 @@ class MyMonitor( xbmc.Monitor ):
         
   def onSettingsChanged( self ):
     settings.start()
-    if not settings.reconnect:
-      settings.handleGlobalSettings()
-      settings.handleStaticBgSettings()
+    check_state()
       
   def onScreensaverDeactivated( self ):
     settings.screensaver = False
@@ -157,13 +130,39 @@ class Main():
   
     return loaded  
 
+def check_state(): 
+  if xbmc.Player().isPlaying():
+    state = 'start'
+  else:
+    state = 'stop'  
+  myPlayerChanged( state )    
+
+def myPlayerChanged(state):
+  log('PlayerChanged(%s)' % state)
+  xbmc.sleep(100)
+  if state == 'stop':
+    ret = "static"
+  else:
+    if xbmc.getCondVisibility("VideoPlayer.Content(musicvideos)"):
+      ret = "musicvideo"
+    else:
+      ret = "movie"  
+  
+    if settings.overwrite_cat:                  # fix his out when other isn't
+      if settings.overwrite_cat_val == 0:       # the static light anymore
+        ret = "movie"
+      else:
+        ret = "musicvideo"
+  settings.handleCategory(ret)
+
+
 def run_boblight():
   main = Main()
   xbmc_monitor   = MyMonitor()
   player_monitor = MyPlayer()
   if main.startup() == 0 and main.connectBoblight(False):
     settings.bob_init()           #init light bling bling
-    player_monitor.check_state()
+    check_state()
     capture_width = 32
     capture_height = 32
     capture        = xbmc.RenderCapture()
