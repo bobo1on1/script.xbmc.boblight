@@ -172,7 +172,7 @@ def run_boblight():
       if not settings.bobdisable:
         if not bob.bob_ping() or settings.reconnect:
           if main.connectBoblight(settings.reconnect):
-            player_monitor.check_state()
+            check_state()
           settings.reconnect = False        
           
         if not settings.staticBobActive:
