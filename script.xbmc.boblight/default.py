@@ -109,19 +109,20 @@ class Main():
     libpath  = get_libpath(platform)
     loaded   = bob.bob_loadLibBoblight(libpath)
   
-    if loaded == 1:                                                     #libboblight not found                                               
-      if platform == 'osx' or platform == 'win32' or platform == 'ios': # ask user if we should fetch the
-        t1 = __language__(504)                                          # lib for osx and windows
+    if loaded == 1:                                #libboblight not found                                               
+      if platform == 'linux':
+        t1 = __language__(504)
+        t2 = __language__(505)
+        t3 = __language__(506)
+        xbmcgui.Dialog().ok(__scriptname__,t1,t2,t3)
+      
+      else:                                        # ask user if we should fetch the
+        t1 = __language__(504)                     # lib for osx, ios and windows
         t2 = __language__(509)
         if xbmcgui.Dialog().yesno(__scriptname__,t1,t2):
           tools_downloadLibBoblight(platform)
           loaded = bob.bob_loadLibBoblight(libpath)
       
-      elif platform == 'linux':
-        t1 = __language__(504)
-        t2 = __language__(505)
-        t3 = __language__(506)
-        xbmcgui.Dialog().ok(__scriptname__,t1,t2,t3)
         
     elif loaded == 2:         #no ctypes available
       t1 = __language__(507)
