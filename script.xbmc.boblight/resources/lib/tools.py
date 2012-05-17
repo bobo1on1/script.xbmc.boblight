@@ -53,8 +53,8 @@ def tools_downloadLibBoblight(platform):
   url = "%s/%s/%s.zip" % (__libbaseurl__, platform, libname)
   dest = os.path.join( destdir, libname)
   DownloaderClass(url, dest + ".zip")
-  log("boblight: " + url + " -> " + dest)
-  xbmc.executebuiltin('XBMC.Extract("%s","%s")' % (dest + ".zip", destdir), True)
+  log("%s -> %s" % (url, dest))
+  xbmc.executebuiltin('XBMC.Extract("%s.zip","%s")' % (dest, destdir), True)
   os.remove(dest + ".zip")
 
 def log(msg):
