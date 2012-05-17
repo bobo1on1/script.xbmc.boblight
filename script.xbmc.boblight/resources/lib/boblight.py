@@ -63,7 +63,6 @@ class Boblight():
         if not os.path.exists(libname) and platform != "linux":
           ret = 1
         else:
-          cdll.LoadLibrary(libname)
           self.libboblight = CDLL(libname)
           self.libboblight.boblight_init.restype = c_void_p
           self.libboblight.boblight_geterror.restype = c_char_p
