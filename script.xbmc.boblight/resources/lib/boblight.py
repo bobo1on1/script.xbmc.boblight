@@ -56,11 +56,11 @@ class Boblight():
     self.connected        = False
     self.boblightLoaded   = False
 
-  def bob_loadLibBoblight(self,libname):
+  def bob_loadLibBoblight(self,libname,platform):
     ret = 0
     if HAVE_CTYPES:
       try:
-        if not os.path.exists(libname):
+        if not os.path.exists(libname) and platform != "linux":
           ret = 1
         else:
           cdll.LoadLibrary(libname)

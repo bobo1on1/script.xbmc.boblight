@@ -107,7 +107,7 @@ class Main():
   def startup(self):
     platform = get_platform()
     libpath  = get_libpath(platform)
-    loaded   = bob.bob_loadLibBoblight(libpath)
+    loaded   = bob.bob_loadLibBoblight(libpath,platform)
   
     if loaded == 1:                                #libboblight not found                                               
       if platform == 'linux':
@@ -121,7 +121,7 @@ class Main():
         t2 = __language__(509)
         if xbmcgui.Dialog().yesno(__scriptname__,t1,t2):
           tools_downloadLibBoblight(platform)
-          loaded = bob.bob_loadLibBoblight(libpath)
+          loaded = bob.bob_loadLibBoblight(libpath,platform)
       
         
     elif loaded == 2:         #no ctypes available
