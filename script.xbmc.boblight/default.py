@@ -39,7 +39,9 @@ from tools import *
 
 log( "[%s] - Version: %s Started" % (__scriptname__,__version__))
 
-settings = settings()
+capture_width  = 32
+capture_height = 32
+settings       = settings()
 
 class MyPlayer( xbmc.Player ):
   def __init__( self, *args, **kwargs ):
@@ -62,7 +64,8 @@ class MyMonitor( xbmc.Monitor ):
         
   def onSettingsChanged( self ):
     settings.start()
-    check_state()
+    if not settings.reconnect:
+      check_state()
       
   def onScreensaverDeactivated( self ):
     settings.screensaver = False
@@ -161,11 +164,7 @@ def run_boblight():
   main = Main()
   xbmc_monitor   = MyMonitor()
   player_monitor = MyPlayer()
-  if main.startup() == 0 and main.connectBoblight(False):
-    settings.bob_init()           #init light bling bling
-    check_state()
-    capture_width = 32
-    capture_height = 32
+  if main.startup() == 0:
     capture        = xbmc.RenderCapture()
     capture.capture(capture_width, capture_height, xbmc.CAPTURE_FLAG_CONTINUOUS)
     while not xbmc.abortRequested:
@@ -173,7 +172,8 @@ def run_boblight():
       if not settings.bobdisable:
         if not bob.bob_ping() or settings.reconnect:
           if main.connectBoblight(settings.reconnect):
-            check_state()
+            if settings.bob_init():
+              check_state()
           settings.reconnect = False        
           
         if not settings.staticBobActive:

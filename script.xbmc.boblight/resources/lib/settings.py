@@ -39,6 +39,7 @@ class settings():
   def __init__( self, *args, **kwargs ):
     log('settings() - __init__')
     self.staticBobActive            = False
+    self.run_init                   = True
     self.category                   = "static"
     self.networkaccess              = __addon__.getSetting("networkaccess") == "true"
     if not self.networkaccess:
@@ -227,18 +228,21 @@ class settings():
     self.handleStaticBgSettings()
 
   def bob_init(self):
-    log('bob_init')
-    nrLights = bob.bob_getnrlights()
-    log("settings() - Found %s lights" % str(nrLights))
-    for i in range(nrLights):
-      lightname = bob.bob_getlightname(i)
-      log("settings() - Light[%.2d] - %s" % (i+1, lightname))
-    
-    self.handleGlobalSettings()
-    bob.bob_set_priority(128)           # allow lights to be turned on, we will switch them off
-                                        # in 'handleStaticBgSettings()' if they are not needed
-    for i in range(len(BLING)):
-      rgb = (c_int * 3)(BLING[i][0],BLING[i][1],BLING[i][2])
-      bob.bob_set_static_color(byref(rgb))
-      xbmc.sleep(1000)
-
+    if self.run_init:
+      log('bob_init')
+      nrLights = bob.bob_getnrlights()
+      log("settings() - Found %s lights" % str(nrLights))
+      for i in range(nrLights):
+        lightname = bob.bob_getlightname(i)
+        log("settings() - Light[%.2d] - %s" % (i+1, lightname))
+      
+      self.handleGlobalSettings()
+      bob.bob_set_priority(128)           # allow lights to be turned on, we will switch them off
+                                          # in 'handleStaticBgSettings()' if they are not needed
+      for i in range(len(BLING)):
+        rgb = (c_int * 3)(BLING[i][0],BLING[i][1],BLING[i][2])
+        bob.bob_set_static_color(byref(rgb))
+        xbmc.sleep(1000)
+      self.run_init = False
+      xbmc.sleep(500)
+    return True  
