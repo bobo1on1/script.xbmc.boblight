@@ -1,3 +1,6 @@
+2.0.0
+compleate rewrite of the addon, it uses xbmc.Monitor class to monitor for changes in addon settings, player start/stop and others
+
 1.0.3
 - fixed the lib downloading code on win32
 
