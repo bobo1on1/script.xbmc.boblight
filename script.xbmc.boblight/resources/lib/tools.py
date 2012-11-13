@@ -25,6 +25,8 @@ import urllib
 
 __scriptname__ = sys.modules[ "__main__" ].__scriptname__
 __cwd__        = sys.modules[ "__main__" ].__cwd__
+__icon__       = sys.modules[ "__main__" ].__icon__
+__language__   = sys.modules[ "__main__" ].__language__
 
 __libbasepath__  = xbmc.translatePath(os.path.join(__cwd__,'resources','lib','%s') )
 __libbaseurl__   = "http://mirrors.xbmc.org/build-deps/addon-deps/binaries/libboblight"
@@ -52,10 +54,14 @@ def tools_downloadLibBoblight(platform):
   destdir = xbmc.translatePath( os.path.join( __cwd__, 'resources', 'lib') )
   url = "%s/%s/%s.zip" % (__libbaseurl__, platform, libname)
   dest = os.path.join( destdir, libname)
-  DownloaderClass(url, dest + ".zip")
-  log("%s -> %s" % (url, dest))
-  xbmc.executebuiltin('XBMC.Extract("%s.zip","%s")' % (dest, destdir), True)
-  os.remove(dest + ".zip")
+  try:
+    DownloaderClass(url, dest + ".zip")
+    log("%s -> %s" % (url, dest))
+    xbmc.executebuiltin('XBMC.Extract("%s.zip","%s")' % (dest, destdir), True)
+    os.remove(dest + ".zip")
+  except:
+    text = __language__(510)
+    xbmc.executebuiltin("XBMC.Notification(%s,%s,%s,%s)" % (__scriptname__,text,750,__icon__))
 
 def log(msg):
   xbmc.log("### [%s] - %s" % (__scriptname__,msg,),level=xbmc.LOGDEBUG )

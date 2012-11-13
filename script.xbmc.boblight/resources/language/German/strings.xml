@@ -53,4 +53,5 @@
   <string id="507">Dieses Addon kann auf Ihrem Betriebssystem nicht</string>
   <string id="508">ausgefuehrt werden! (Das ctypes Modul fehlt)</string>
   <string id="509">Soll versucht werden diese automatisch herunterzuladen?</string>
+  <string id="510">Fehler beim Herunterladen. Dateisystemberechtigungen pruefen.</string>
 </strings>
