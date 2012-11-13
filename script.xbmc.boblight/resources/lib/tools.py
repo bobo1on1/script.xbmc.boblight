@@ -44,7 +44,7 @@ def _pbhook(numblocks, blocksize, filesize, url=None,dp=None):
         log("boblight: DOWNLOAD FAILED") # need to get this part working        
     if dp.iscanceled(): 
         log("boblight: DOWNLOAD CANCELLED") # need to get this part working
-        dp.close()
+    dp.close()
  
 def tools_downloadLibBoblight(platform):
   log("boblight: try to fetch libboblight")
