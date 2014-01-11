@@ -90,7 +90,16 @@ class settings():
     self.movie_interpolation        = int(__addon__.getSetting("movie_interpolation") == "true")
     self.movie_threshold            = float(__addon__.getSetting("movie_threshold"))
     self.movie_preset               = int(__addon__.getSetting("movie_preset"))
-    
+
+    # TV Shows and LiveTV settings
+    self.tvshow_saturation           = float(__addon__.getSetting("tvshow_saturation"))
+    self.tvshow_value                = float(__addon__.getSetting("tvshow_value"))
+    self.tvshow_speed                = float(__addon__.getSetting("tvshow_speed"))
+    self.tvshow_autospeed            = float(__addon__.getSetting("tvshow_autospeed"))
+    self.tvshow_interpolation        = int(__addon__.getSetting("tvshow_interpolation") == "true")
+    self.tvshow_threshold            = float(__addon__.getSetting("tvshow_threshold"))
+    self.tvshow_preset               = int(__addon__.getSetting("tvshow_preset"))
+      
     # Music Video settings
     self.music_saturation           = float(__addon__.getSetting("musicvideo_saturation"))
     self.music_value                = float(__addon__.getSetting("musicvideo_value"))
@@ -127,7 +136,35 @@ class settings():
       interpolation   =  self.movie_interpolation
       threshold       =  self.movie_threshold
     return (saturation,value,speed,autospeed,interpolation,threshold)
+
+  #handle boblight configuration from the "TVShows" and "LiveTV" category
+  #returns the new settings
+  def setupForTVShow(self):
+    log('settings() - setupForTVShow')
   
+    if self.tvshow_preset == 1:       #preset smooth
+      saturation    = 3.0
+      value         = 10.0
+      speed         = 20.0
+      autospeed     = 0.0 
+      interpolation = 0
+      threshold     = 0.0
+    elif self.tvshow_preset == 2:     #preset action
+      saturation    = 3.0
+      value         = 10.0
+      speed         = 80.0
+      autospeed     = 0.0  
+      interpolation = 0
+      threshold     = 0.0
+    elif self.tvshow_preset == 0:     #custom
+      saturation      =  self.movie_saturation
+      value           =  self.movie_value
+      speed           =  self.movie_speed
+      autospeed       =  self.movie_autospeed
+      interpolation   =  self.movie_interpolation
+      threshold       =  self.movie_threshold
+    return (saturation,value,speed,autospeed,interpolation,threshold)
+    
   #handle boblight configuration from the "MusicVideo" category
   #returns the new settings
   def setupForMusicVideo(self):
@@ -211,6 +248,7 @@ class settings():
       #call the right setup function according to categroy
       #switch case in python - dictionary with function pointers
       option = { "movie"      : self.setupForMovie,
+                 "tvshow"     : self.setupForTVShow,
                  "musicvideo" : self.setupForMusicVideo,
                  "other"      : self.setupForOther,
                  "static"     : self.setupForStatic, 

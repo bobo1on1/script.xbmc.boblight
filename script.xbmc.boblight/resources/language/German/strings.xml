@@ -56,4 +56,11 @@
   <string id="32508">ausgefuehrt werden! (Das ctypes Modul fehlt)</string>
   <string id="32509">Soll versucht werden diese automatisch herunterzuladen?</string>
   <string id="32510">Fehler beim Herunterladen. Dateisystemberechtigungen pruefen.</string>
+  
+  <!--TVShows and LiveTV-->
+  <string id="32600">TV-Serien</string>
+  
+  <string id="32620">Eigene</string>
+  <string id="32621">langsam</string>
+  <string id="32622">schnell</string>
 </strings>

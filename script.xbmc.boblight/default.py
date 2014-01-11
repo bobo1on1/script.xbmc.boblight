@@ -157,6 +157,10 @@ def myPlayerChanged(state):
   else:
     if xbmc.getCondVisibility("VideoPlayer.Content(musicvideos)"):
       ret = "musicvideo"
+    elif xbmc.getCondVisibility("VideoPlayer.Content(episodes)"):
+      ret = "tvshow"
+    elif xbmc.getCondVisibility("VideoPlayer.Content(livetv)"):
+      ret = "tvshow"
     elif xbmc.getCondVisibility("Player.HasAudio()"):
       ret = "static"
     else:

@@ -56,6 +56,13 @@
   <string id="32508">operating system! (missing ctypes module)</string>
   <string id="32509">Should the addon try to download it for you?</string>
   <string id="32510">Error downloading. Check filesystem permissions.</string>
+
+  <!--TVShows and LiveTV-->
+  <string id="32600">TV Shows</string>
+  
+  <string id="32620">Custom</string>
+  <string id="32621">Slow</string>
+  <string id="32622">Fast</string>
 </strings>
 
 

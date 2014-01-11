@@ -2,7 +2,7 @@
 <settings>
   <category label="32100">
     <setting id="overwrite_cat" type="bool" label="32105" default="false" />
-    <setting id="overwrite_cat_val" type="enum" subsetting="true" enable="eq(-1,true)" label="32106" default="0" lvalues="32200|32300" />
+    <setting id="overwrite_cat_val" type="enum" subsetting="true" enable="eq(-1,true)" label="32106" default="0" lvalues="32200|32300|32600" />
     <setting id="sep1" type="sep" />
     <setting id="networkaccess" type="bool" label="32101" default="false" />
     <setting id="hostip" type="ipaddress" subsetting="true" enable="eq(-1,true)" label="32102" default="127.0.0.1" />
@@ -18,6 +18,15 @@
     <setting id="movie_saturation" type="slider" subsetting="true" visible="eq(-4,0)" label="32205" option="float" default="0" range="0,0.1,20" />
     <setting id="movie_value" type="slider" subsetting="true" visible="eq(-5,0)" label="32206" option="float" default="0" range="0,0.1,20" />
     <setting id="movie_threshold" type="slider" subsetting="true" visible="eq(-6,0)" label="32207" default="0" range="0,255" />
+  </category>
+  <category label="32600">
+    <setting id="tvshow_preset" type="enum" label="32201" default="1" lvalues="32620|32621|32622" />
+    <setting id="tvshow_speed" type="slider" subsetting="true" visible="eq(-1,0)" label="32202" default="100" range="0,100" />
+    <setting id="tvshow_autospeed" type="slider" subsetting="true" visible="eq(-2,0)" label="32203" default="0" range="0,100" />
+    <setting id="tvshow_interpolation" type="bool" subsetting="true" visible="eq(-3,0)" label="32204" default="false" />
+    <setting id="tvshow_saturation" type="slider" subsetting="true" visible="eq(-4,0)" label="32205" option="float" default="0" range="0,0.1,20" />
+    <setting id="tvshow_value" type="slider" subsetting="true" visible="eq(-5,0)" label="32206" option="float" default="0" range="0,0.1,20" />
+    <setting id="tvshow_threshold" type="slider" subsetting="true" visible="eq(-6,0)" label="32207" default="0" range="0,255" />
   </category>
   <category label="32300">
     <setting id="musicvideo_preset" type="enum" label="32201" default="1" lvalues="32320|32321|32322" />
