@@ -1,5 +1,6 @@
 2.0.6
 - [changed] use correct string ID range
+- [feature] added a new preset category used for tvshows and livetv
 
 2.0.5
 - [fix] recover if boblightd is disconnected while movie is playing - by amet
