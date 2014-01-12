@@ -146,7 +146,7 @@ class settings():
       autospeed     = 0.0  
       interpolation = 0
       threshold     = 0.0
-    elif self.movie_preset == 3:     #preset action
+    elif self.movie_preset == 3:     #preset disabled
       saturation    = 0.0
       value         = 0.0
       speed         = 0.0
@@ -181,7 +181,7 @@ class settings():
       autospeed     = 0.0  
       interpolation = 0
       threshold     = 0.0
-    elif self.tvshow_preset == 3:     #preset action
+    elif self.tvshow_preset == 3:     #preset disabled
       saturation    = 0.0
       value         = 0.0
       speed         = 0.0
@@ -209,14 +209,14 @@ class settings():
       autospeed     = 0.0 
       interpolation = 0
       threshold     = 0.0
-    elif self.livetv_preset == 2:     #preset action
+    elif self.livetv_preset == 2:     #preset action 
       saturation    = 3.0
       value         = 10.0
       speed         = 80.0
       autospeed     = 0.0  
       interpolation = 0
       threshold     = 0.0
-    elif self.livetv_preset == 3:     #preset action
+    elif self.livetv_preset == 3:     #preset disabled
       saturation    = 0.0
       value         = 0.0
       speed         = 0.0
@@ -251,7 +251,7 @@ class settings():
       autospeed     = 0.0  
       interpolation = 0
       threshold     = 0.0
-    elif self.files_preset == 3:     #preset action
+    elif self.files_preset == 3:     #preset disabled
       saturation    = 0.0
       value         = 0.0
       speed         = 0.0
@@ -283,6 +283,13 @@ class settings():
       saturation    = 3.0
       value         = 10.0
       speed         = 80.0
+      autospeed     = 0.0  
+      interpolation = 0
+      threshold     = 0.0
+    elif self.music_preset == 3:     #preset disabled
+      saturation    = 0.0
+      value         = 0.0
+      speed         = 0.0
       autospeed     = 0.0  
       interpolation = 0
       threshold     = 0.0
