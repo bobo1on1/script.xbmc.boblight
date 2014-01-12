@@ -1,5 +1,6 @@
 2.0.6
 - [changed] use correct string ID range
+- [language] added dutch translations - thx to georgehenze
 - [feature] added a new preset categories used for tvshows, livetv and files (everything outside of the movie database)
 - [feature] for all categories there is a new preset "disabled" which basically disables boblight. This allows to 
   watch live-tv without boblight and movies with - without needing to change the addon settings - thx to georgehenze for
