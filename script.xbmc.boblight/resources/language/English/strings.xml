@@ -26,6 +26,7 @@
   <string id="32220">Custom</string>
   <string id="32221">Slow</string>
   <string id="32222">Fast</string>
+  <string id="32223">Disabled</string>
   
   <!--MusicVideo-->
   <string id="32300">Musicvideo</string>
@@ -33,6 +34,7 @@
   <string id="32320">Custom</string>
   <string id="32321">Slow</string>
   <string id="32322">Fast</string>
+  <string id="32323">Disabled</string>
   
   <!--Other-->
   <string id="32400">Other</string>
@@ -57,12 +59,30 @@
   <string id="32509">Should the addon try to download it for you?</string>
   <string id="32510">Error downloading. Check filesystem permissions.</string>
 
-  <!--TVShows and LiveTV-->
+  <!--TVShows-->
   <string id="32600">TV Shows</string>
   
   <string id="32620">Custom</string>
   <string id="32621">Slow</string>
   <string id="32622">Fast</string>
+  <string id="32623">Disabled</string>
+
+  <!--LiveTV-->
+  <string id="32700">LiveTV</string>
+  
+  <string id="32720">Custom</string>
+  <string id="32721">Slow</string>
+  <string id="32722">Fast</string>
+  <string id="32723">Disabled</string>
+
+  <!--Files-->
+  <string id="32800">Files</string>
+  
+  <string id="32820">Custom</string>
+  <string id="32821">Slow</string>
+  <string id="32822">Fast</string>
+  <string id="32823">Disabled</string>
+
 </strings>
 
 
