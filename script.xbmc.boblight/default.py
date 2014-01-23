@@ -75,12 +75,10 @@ class MyMonitor( xbmc.Monitor ):
       check_state()
       
   def onScreensaverDeactivated( self ):
-    settings.screensaver = False
-    settings.handleStaticBgSettings()
+    settings.setScreensaver(False)
       
   def onScreensaverActivated( self ):    
-    settings.screensaver = True
-    settings.handleStaticBgSettings()
+    settings.setScreensaver(True)
 
 class Main():
   def __init__( self, *args, **kwargs ):
