@@ -154,24 +154,34 @@ def myPlayerChanged(state):
     ret = "static"
   else:
     # Possible Videoplayer options: files, movies, episodes, musicvideos, livetv
-    if xbmc.getCondVisibility("VideoPlayer.Content(musicvideos)"):
-      ret = "musicvideo"
-    elif xbmc.getCondVisibility("VideoPlayer.Content(episodes)"):
-      ret = "tvshow"
-    elif xbmc.getCondVisibility("VideoPlayer.Content(livetv)"):
-      ret = "livetv"
-    elif xbmc.getCondVisibility("VideoPlayer.Content(files)"):
-      ret = "files"
+    if xbmc.getCondVisibility("Player.HasVideo()"):
+      if xbmc.getCondVisibility("VideoPlayer.Content(musicvideos)"):
+        ret = "musicvideo"
+      elif xbmc.getCondVisibility("VideoPlayer.Content(episodes)"):
+        ret = "tvshow"
+      elif xbmc.getCondVisibility("VideoPlayer.Content(livetv)"):
+        ret = "livetv"
+      elif xbmc.getCondVisibility("VideoPlayer.Content(files)"):
+        ret = "files"
+
+      #handle overwritten category
+      if settings.overwrite_cat:                  # fix his out when other isn't
+        if settings.overwrite_cat_val == 0:       # the static light anymore
+          ret = "movie"
+        elif settings.overwrite_cat_val == 1:
+          ret = "musicvideo"
+        elif settings.overwrite_cat_val == 2:
+          ret = "tvshow"
+        elif settings.overwrite_cat_val == 3:
+          ret = "livetv"
+        elif settings.overwrite_cat_val == 4:
+          ret = "files"
+
     elif xbmc.getCondVisibility("Player.HasAudio()"):
       ret = "static"
     else:
       ret = "movie"  
   
-    if settings.overwrite_cat:                  # fix his out when other isn't
-      if settings.overwrite_cat_val == 0:       # the static light anymore
-        ret = "movie"
-      else:
-        ret = "musicvideo"
   settings.handleCategory(ret)
 
 
