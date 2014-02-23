@@ -108,7 +108,7 @@ class Main():
       self.warning = 0
       if settings.other_misc_notifications:
         text = __language__(32501)
-        xbmc.executebuiltin("XBMC.Notification(%s,%s,%s,%s)" % (__scriptname__,text,750,__icon__))
+        xbmc.executebuiltin("XBMC.Notification(%s,%s,%s,%s)" % (__scriptname__,text.encode('utf-8','ignore'),750,__icon__))
       log("connected to boblightd")
       bob.bob_set_priority(128)  
       return True
