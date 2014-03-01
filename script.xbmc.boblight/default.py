@@ -96,9 +96,11 @@ class Main():
   
     if not ret:
       log("connection to boblightd failed: %s" % bob.bob_geterror())
-      text = localize(32500)
       if self.warning < 3 and settings.other_misc_notifications:
-        xbmc.executebuiltin("XBMC.Notification(%s,%s,%s,%s)" % (__scriptname__,text,750,__icon__))
+        xbmc.executebuiltin("XBMC.Notification(%s,%s,%s,%s)" % (__scriptname__,
+                                                                localize(32500),
+                                                                750,
+                                                                __icon__))
         self.warning += 1
       settings.reconnect = True
       settings.run_init = True
@@ -107,8 +109,10 @@ class Main():
     else:
       self.warning = 0
       if settings.other_misc_notifications:
-        text = localize(32501)
-        xbmc.executebuiltin("XBMC.Notification(%s,%s,%s,%s)" % (__scriptname__,text.encode('utf-8','ignore'),750,__icon__))
+        xbmc.executebuiltin("XBMC.Notification(%s,%s,%s,%s)" % (__scriptname__,
+                                                                localize(32501),
+                                                                750,
+                                                                __icon__))
       log("connected to boblightd")
       bob.bob_set_priority(128)  
       return True
@@ -120,23 +124,24 @@ class Main():
   
     if loaded == 1:                                #libboblight not found                                               
       if platform == 'linux':
-        t1 = localize(32504)
-        t2 = localize(32505)
-        t3 = localize(32506)
-        xbmcgui.Dialog().ok(__scriptname__,t1,t2,t3)
+        xbmcgui.Dialog().ok(__scriptname__,
+                            localize(32504),
+                            localize(32505),
+                            localize(32506))
       
-      else:                                        # ask user if we should fetch the
-        t1 = localize(32504)                     # lib for osx, ios and windows
-        t2 = localize(32509)
-        if xbmcgui.Dialog().yesno(__scriptname__,t1,t2):
+      else:
+        # ask user if we should fetch the lib for osx, ios and windows
+        if xbmcgui.Dialog().yesno(__scriptname__,
+                                  localize(32504),
+                                  localize(32509)):
           tools_downloadLibBoblight(platform,settings.other_misc_notifications)
           loaded = bob.bob_loadLibBoblight(libpath,platform)
       
         
     elif loaded == 2:         #no ctypes available
-      t1 = localize(32507)
-      t2 = localize(32508)
-      xbmcgui.Dialog().ok(__scriptname__,t1,t2)
+      xbmcgui.Dialog().ok(__scriptname__,
+                          localize(32507),
+                          localize(32508))
   
     return loaded  
 
