@@ -96,7 +96,7 @@ class Main():
   
     if not ret:
       log("connection to boblightd failed: %s" % bob.bob_geterror())
-      text = __language__(32500)
+      text = localize(32500)
       if self.warning < 3 and settings.other_misc_notifications:
         xbmc.executebuiltin("XBMC.Notification(%s,%s,%s,%s)" % (__scriptname__,text,750,__icon__))
         self.warning += 1
@@ -107,7 +107,7 @@ class Main():
     else:
       self.warning = 0
       if settings.other_misc_notifications:
-        text = __language__(32501)
+        text = localize(32501)
         xbmc.executebuiltin("XBMC.Notification(%s,%s,%s,%s)" % (__scriptname__,text.encode('utf-8','ignore'),750,__icon__))
       log("connected to boblightd")
       bob.bob_set_priority(128)  
@@ -120,22 +120,22 @@ class Main():
   
     if loaded == 1:                                #libboblight not found                                               
       if platform == 'linux':
-        t1 = __language__(32504)
-        t2 = __language__(32505)
-        t3 = __language__(32506)
+        t1 = localize(32504)
+        t2 = localize(32505)
+        t3 = localize(32506)
         xbmcgui.Dialog().ok(__scriptname__,t1,t2,t3)
       
       else:                                        # ask user if we should fetch the
-        t1 = __language__(32504)                     # lib for osx, ios and windows
-        t2 = __language__(32509)
+        t1 = localize(32504)                     # lib for osx, ios and windows
+        t2 = localize(32509)
         if xbmcgui.Dialog().yesno(__scriptname__,t1,t2):
           tools_downloadLibBoblight(platform,settings.other_misc_notifications)
           loaded = bob.bob_loadLibBoblight(libpath,platform)
       
         
     elif loaded == 2:         #no ctypes available
-      t1 = __language__(32507)
-      t2 = __language__(32508)
+      t1 = localize(32507)
+      t2 = localize(32508)
       xbmcgui.Dialog().ok(__scriptname__,t1,t2)
   
     return loaded  
@@ -235,6 +235,9 @@ def run_boblight():
   del main                  #cleanup
   del player_monitor
   del xbmc_monitor
+
+def localize(id):
+    return __language__(id).encode('utf-8','ignore')
 
 if ( __name__ == "__main__" ):
   run_boblight()
