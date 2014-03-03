@@ -167,6 +167,8 @@ def myPlayerChanged(state):
         ret = "musicvideo"
       elif xbmc.getCondVisibility("VideoPlayer.Content(episodes)"):
         ret = "tvshow"
+      elif xbmc.getCondVisibility("VideoPlayer.Content(livetv)"):
+        ret = "livetv"
       elif xbmc.getCondVisibility("VideoPlayer.Content(files)"):
         ret = "files"
 
@@ -183,9 +185,6 @@ def myPlayerChanged(state):
         elif settings.overwrite_cat_val == 4:
           ret = "files"
 
-    # Player.HasVideo() returns False for "livetv".
-    elif xbmc.getCondVisibility("VideoPlayer.Content(livetv)"):
-      ret = "livetv"
     elif xbmc.getCondVisibility("Player.HasAudio()"):
       ret = "static"
     else:
