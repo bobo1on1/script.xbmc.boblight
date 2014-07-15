@@ -52,6 +52,10 @@ class MyPlayer( xbmc.Player ):
   def onPlayBackStopped( self ):
     self.playing = False
     myPlayerChanged( 'stop' )
+
+  def onPlayBackPaused( self ):
+    myPlayerChanged( 'paused' )
+
   
   def onPlayBackEnded( self ):
     self.playing = False
@@ -188,10 +192,10 @@ def myPlayerChanged(state):
     elif xbmc.getCondVisibility("Player.HasAudio()"):
       ret = "static"
     else:
-      ret = "movie"  
-  
-  settings.handleCategory(ret)
+      ret = "movie"
 
+  settings.handleCategory(ret)
+  settings.handleStereoscopic(xbmc.getInfoLabel("System.StereoscopicMode") != "0")
 
 def run_boblight():
   main = Main()

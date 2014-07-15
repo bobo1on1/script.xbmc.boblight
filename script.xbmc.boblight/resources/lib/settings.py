@@ -59,6 +59,7 @@ class settings():
     self.overwrite_cat_val          = int(__addon__.getSetting("overwrite_cat_val"))
     self.bobdisableonscreensaver    = __addon__.getSetting("bobdisableonscreensaver") == "true"
     self.bobdisable                 = __addon__.getSetting("bobdisable") == "true"
+    self.bobdisableon3d             = __addon__.getSetting("bobdisableon3d") == "true"
     self.current_option             = ""
     
     if not self.networkaccess:
@@ -126,17 +127,21 @@ class settings():
     self.music_threshold            = float(__addon__.getSetting("musicvideo_threshold"))
     self.music_preset               = int(__addon__.getSetting("musicvideo_preset"))
 
+  def resetBobDisable(self):
+    # reset the bobdisable setting from settings
+    self.bobdisable = __addon__.getSetting("bobdisable") == "true" 
+    if not self.bobdisable:#if we are not disabled in general
+      if self.category == "static":
+        self.handleStaticBgSettings()#turns on or off the lights based on static settings
+      else:#we are playing something - turn the lights on
+        bob.bob_set_priority(128) #lights on
+
   def setScreensaver(self, enabled):
     if self.bobdisableonscreensaver and enabled:
       self.bobdisable = True
     else:
       # reset the bobdisable setting from settings
-      self.bobdisable = __addon__.getSetting("bobdisable") == "true" 
-      if not self.bobdisable:#if we are not disabled in general
-        if self.category == "static":
-          self.handleStaticBgSettings()#turns on or off the lights based on static settings
-        else:#we are playing something - turn the lights on
-          bob.bob_set_priority(128) #lights on
+      self.resetBobDisable()
 
   #handle boblight configuration from the "Movie" category
   #returns the new settings
@@ -386,6 +391,14 @@ class settings():
     self.category = category
     self.handleGlobalSettings()
     self.handleStaticBgSettings()
+
+  def handleStereoscopic(self, isStereoscopic):
+    log('settings() - handleStereoscopic(%s) - disableon3d (%s)' % (isStereoscopic, self.bobdisableon3d))
+    if self.bobdisableon3d and isStereoscopic:
+      log('settings()- disable due to 3d')
+      self.bobdisable = True
+    else:
+      self.resetBobDisable()
 
   def bob_init(self):
     if self.run_init:

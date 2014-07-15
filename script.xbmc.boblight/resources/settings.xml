@@ -9,6 +9,7 @@
     <setting id="hostport" type="number" subsetting="true" enable="eq(-2,true)" label="32103" default="19333" />
     <setting id="sep2" type="sep" />
     <setting id="bobdisableonscreensaver" type="bool" label="32405" default="false" />
+    <setting id="bobdisableon3d" type="bool" label="32107" default="false" />
     <setting id="bobdisable" type="bool" label="32104" default="false" />
   </category>
   <category label="32200">

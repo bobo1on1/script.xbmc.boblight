@@ -48,7 +48,11 @@ msgctxt "#32106"
 msgid "Category"
 msgstr ""
 
-#empty strings from id 32107 to 32199
+msgctxt "#32107"
+msgid "Disable for 3D content"
+msgstr ""
+
+#empty strings from id 32108 to 32199
 #Movie/MusicVideo/Other
 
 msgctxt "#32200"
