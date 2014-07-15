@@ -1,3 +1,6 @@
+2.0.10
+- [feature] - add setting for disableing boblight for 3d content
+
 2.0.9
 - [fix] custom category detection
 - [fix] custom category settings
