@@ -134,7 +134,7 @@ class Main():
                             localize(32506))
       
       else:
-        # ask user if we should fetch the lib for osx, ios and windows
+        # ask user if we should fetch the lib for osx, ios, android and windows
         if xbmcgui.Dialog().yesno(__scriptname__,
                                   localize(32504),
                                   localize(32509)):
