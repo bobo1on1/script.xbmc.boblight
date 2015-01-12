@@ -1,3 +1,6 @@
+2.0.13
+- [feature] - support RGBA and RGB capture formats
+
 2.0.11
 - [feature] - enable android support
 

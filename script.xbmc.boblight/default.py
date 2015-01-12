@@ -205,6 +205,31 @@ def run_boblight():
   if main.startup() == 0:
     capture        = xbmc.RenderCapture()
     capture.capture(capture_width, capture_height, xbmc.CAPTURE_FLAG_CONTINUOUS)
+
+    #default BGR
+    idxR = 2
+    idxG = 1
+    idxB = 0
+    bytesPerPixel = 3
+
+    if capture.getImageFormat() == 'RGBA':
+      idxR = 0
+      idxG = 1
+      idxB = 2
+      bytesPerPixel = 4
+
+    if capture.getImageFormat() == 'RGB':
+      idxR = 0
+      idxG = 1
+      idxB = 2
+      bytesPerPixel = 3
+
+    if capture.getImageFormat() == 'BGRA':
+      idxR = 2
+      idxG = 1
+      idxB = 0
+      bytesPerPixel = 4
+
     while not xbmc.abortRequested:
       xbmc.sleep(100)
       if not settings.bobdisable:
@@ -224,11 +249,11 @@ def run_boblight():
             bob.bob_setscanrange(width, height)
             rgb = (c_int * 3)()
             for y in range(height):
-              row = width * y * 4
+              row = width * y * bytesPerPixel
               for x in range(width):
-                rgb[0] = pixels[row + x * 4 + 2]
-                rgb[1] = pixels[row + x * 4 + 1]
-                rgb[2] = pixels[row + x * 4]
+                rgb[0] = pixels[row + x * bytesPerPixel + idxR]
+                rgb[1] = pixels[row + x * bytesPerPixel + idxG]
+                rgb[2] = pixels[row + x * bytesPerPixel + idxB]
                 bob.bob_addpixelxy(x, y, byref(rgb))
 
             bob.bob_set_priority(128)
