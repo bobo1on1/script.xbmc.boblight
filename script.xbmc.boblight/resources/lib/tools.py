@@ -29,7 +29,7 @@ __icon__       = sys.modules[ "__main__" ].__icon__
 __language__   = sys.modules[ "__main__" ].__language__
 
 __libbasepath__  = xbmc.translatePath(os.path.join(__cwd__,'resources','lib','%s') )
-__libbaseurl__   = "http://mirrors.xbmc.org/build-deps/addon-deps/binaries/libboblight"
+__libbaseurl__   = "http://mirrors.kodi.tv/build-deps/addon-deps/binaries/libboblight"
 
 def DownloaderClass(url,dest):
     dp = xbmcgui.DialogProgress()
