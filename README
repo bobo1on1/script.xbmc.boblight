@@ -1,4 +1,4 @@
-This is the boblight addon for using the open source ambilight clone ( http://code.google.com/p/boblight/ ) from within XBMC.
+This is the boblight addon for using the open source ambilight clone ( http://code.google.com/p/boblight/ ) from within Kodi.
 
 For accessing the settings during video playback just put the file script.xbmc.boblight.keymap.xml into your "userdata/keymaps" folder. 
 
